@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Usuarios</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Usuarios</h1>
+    <table id="usersTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <!-- Agrega más columnas según tu entidad User -->
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Las filas se llenarán dinámicamente con JavaScript -->
+        </tbody>
+    </table>
+
+    <script>
+        // Función para obtener la lista de usuarios desde el endpoint
+        async function fetchUsers() {
+            try {
+                const response = await fetch('/api/users/list');
+                if (!response.ok) {
+                    throw new Error('Error al obtener los usuarios');
+                }
+                const users = await response.json();
+                displayUsers(users);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Función para mostrar los usuarios en la tabla
+        function displayUsers(users) {
+            const tableBody = document.querySelector('#usersTable tbody');
+            tableBody.innerHTML = ''; // Limpiar la tabla antes de agregar nuevos datos
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <!-- Agrega más celdas según tu entidad User -->
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Llamar a la función fetchUsers cuando la página se cargue
+        document.addEventListener('DOMContentLoaded', fetchUsers);
+    </script>
+</body>
+</html>
