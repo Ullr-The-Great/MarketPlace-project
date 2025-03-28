@@ -15,7 +15,7 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
-    @Column(columnDefinition = "CLOB")
+    @Column(length=4000)
     private String description;
 
     @Column(nullable = false)
