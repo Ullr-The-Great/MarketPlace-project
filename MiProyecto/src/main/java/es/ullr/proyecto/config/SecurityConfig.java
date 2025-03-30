@@ -67,13 +67,14 @@ public class SecurityConfig {
 		@Bean
 	    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 	        http
-	            .csrf().disable()
 	            .authorizeRequests()
-	                .requestMatchers("/api/auth/**").permitAll() // Permitir acceso público a /api/auth/**
+	                .requestMatchers("/api/auth/login").permitAll() // Permitir acceso público a /api/auth/**
 	                .requestMatchers("/api/users/register").permitAll() // Permitir registro de usuarios
 	                .requestMatchers("/error").permitAll()
-	                .anyRequest().permitAll() // Todas las demás rutas requieren autenticación
+	                .anyRequest().authenticated() // Todas las demás rutas requieren autenticación
 	            .and()
+	            .httpBasic().and()
+	            .csrf().disable()
 	            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // No usar sesiones
 
 	       http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

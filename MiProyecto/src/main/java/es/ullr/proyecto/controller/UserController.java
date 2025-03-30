@@ -52,7 +52,7 @@ public class UserController
     // Registrar un nuevo usuario
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody User user) {
-        user.setRole("ROLE_USER"); // Asignar rol por defecto
+        user.setRole("ROLE_ADMIN"); // Asignar rol por defecto
         User savedUser = userService.createUser(user);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
