@@ -47,34 +47,34 @@ public class SecurityConfig {
 
 	       http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);*/
 			
-			http
+			return http
 				.csrf(customizer-> customizer.disable())
-				.authorizeHttpRequests(request -> request.anyRequest().authenticated())
+				.authorizeHttpRequests(request -> request
+						.requestMatchers("/api/users/register").permitAll()
+						.anyRequest().authenticated())
 				.formLogin(Customizer.withDefaults())
 				.httpBasic(Customizer.withDefaults())
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));;
-
-	        return http.build();
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.build();
 	    }
 
-		/*@Bean
-	    public AuthenticationProvider authenticationProvider() {
+		@Bean
+	    public AuthenticationProvider authenticationProvider(UserDetailsServiceImpl userDetailsService) {
 	        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-	        UserDetailsServiceImpl userDetailsService = new UserDetailsServiceImpl();
 			authProvider.setUserDetailsService(userDetailsService);
 	        authProvider.setPasswordEncoder(passwordEncoder());
 	        return authProvider;
-	    }*/
+	    }
 		
 	    @Bean
 	    public PasswordEncoder passwordEncoder() {
 	        return new BCryptPasswordEncoder();
 	    }
 
-	    /*@Bean
+	    @Bean
 	    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
 	        return authenticationConfiguration.getAuthenticationManager();
-	    }*/
+	    }
 	
 	/*//PRUEBAS
 	@SuppressWarnings({ "removal", "deprecation" })

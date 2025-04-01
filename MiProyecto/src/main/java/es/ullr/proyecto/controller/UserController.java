@@ -4,6 +4,7 @@ import es.ullr.proyecto.model.User;
 import es.ullr.proyecto.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,5 +57,14 @@ public class UserController
         User savedUser = userService.createUser(user);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<User> deleteUserbyId(@PathVariable long id){
+    	
+    	userService.deleteById(id);
+    	return new ResponseEntity<>(HttpStatus.OK);
+    	
+    }
+    
     
 }
