@@ -103,6 +103,12 @@
 		    <scope>runtime</scope>
 		</dependency>
 		
+		<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-oauth2-client</artifactId>
+    <version>6.4.2</version> <!-- Use the correct version matching your Spring Boot version -->
+</dependency>
+		
 	</dependencies>
 
 	<build>

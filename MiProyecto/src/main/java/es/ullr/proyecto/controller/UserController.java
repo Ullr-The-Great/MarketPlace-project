@@ -43,7 +43,7 @@ public class UserController
         return user.map(ResponseEntity::ok).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
     
-    @GetMapping("/list")
+    @GetMapping()
     public ResponseEntity<List<User>> findAllUsers() 
     {
         List<User> listUsers = userService.findAllUsers();

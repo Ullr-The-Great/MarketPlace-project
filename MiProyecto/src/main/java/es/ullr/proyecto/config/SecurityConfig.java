@@ -50,11 +50,12 @@ public class SecurityConfig {
 			return http
 				.csrf(customizer-> customizer.disable())
 				.authorizeHttpRequests(request -> request
-						.requestMatchers("/api/users/register").permitAll()
+						.requestMatchers("/api/users/register","/api/auth/login").permitAll()
 						.anyRequest().authenticated())
-				.formLogin(Customizer.withDefaults())
+				.oauth2Login(Customizer.withDefaults())
 				.httpBasic(Customizer.withDefaults())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
 				.build();
 	    }
 
@@ -71,7 +72,7 @@ public class SecurityConfig {
 	        return new BCryptPasswordEncoder();
 	    }
 
-	    @Bean
+	   @Bean
 	    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
 	        return authenticationConfiguration.getAuthenticationManager();
 	    }
