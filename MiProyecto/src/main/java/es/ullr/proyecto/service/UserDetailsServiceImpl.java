@@ -1,6 +1,7 @@
 package es.ullr.proyecto.service;
 
 import es.ullr.proyecto.model.User;
+import es.ullr.proyecto.model.UserPrincipal;
 import es.ullr.proyecto.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,12 +22,15 @@ public class UserDetailsServiceImpl implements UserDetailsService
     {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
+        
+        return new UserPrincipal(user);
+        
         //SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().toString());
 
-        return org.springframework.security.core.userdetails.User
+        /*return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
                 .password(user.getPassword())
                 .roles(user.getRole())
-                .build();
+                .build();*/
     }
 }

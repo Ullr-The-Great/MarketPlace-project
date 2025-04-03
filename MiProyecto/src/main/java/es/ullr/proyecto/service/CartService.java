@@ -25,10 +25,13 @@ public class CartService {
     @Autowired
     private ProductRepository productRepository;
 
-    public Cart createCart(User user) {
-        Cart cart = new Cart();
-        cart.setUser(user);
-        return cartRepository.save(cart);
+    public Cart getOrCreateCart(User user) {
+        return cartRepository.findByUser(user)
+                .orElseGet(() -> {
+                    Cart newCart = new Cart();
+                    newCart.setUser(user);
+                    return cartRepository.save(newCart);
+                });
     }
 
     public Optional<Cart> findCartByUser(User user) {
@@ -38,6 +41,15 @@ public class CartService {
     public Optional<Cart> findCartById(long id)
     {
     	return cartRepository.findById(id);
+    }
+    
+    public Cart findOrCreateCart(User user) {
+        return cartRepository.findByUser(user)
+            .orElseGet(() -> {
+                Cart newCart = new Cart();
+                newCart.setUser(user);
+                return cartRepository.save(newCart);
+            });
     }
 
     public CartItem addProductToCart(Cart cart, Product product, int quantity) {
@@ -55,12 +67,40 @@ public class CartService {
         }
     }
 
-    public void removeProductFromCart(Cart cart, Product product) {
+    public void removeProductFromCartById(User user, Long productId) {
+    	Cart cart = getOrCreateCart(user);
+        cartItemRepository.findById(productId)
+                .ifPresent(item -> {
+                    if (item.getCart().getId().equals(cart.getId())) {
+                        cartItemRepository.delete(item);
+                    } else {
+                        throw new RuntimeException("El ítem no pertenece al carrito del usuario");
+                    }
+                });
+    }
+
+    public void removeProductFromCart(Cart cart,Product product) {
         Optional<CartItem> cartItem = cartItemRepository.findByCartAndProduct(cart, product);
         cartItem.ifPresent(cartItemRepository::delete);
     }
-
+    
     public List<CartItem> getCartItems(Cart cart) {
         return cartItemRepository.findByCart(cart);
+    }
+    
+    public void clearCart(User user) {
+        
+    	Cart cart = getOrCreateCart(user);
+    	cartItemRepository.deleteByCart(cart);;
+    	/*Optional<Cart> cartOptional = cartRepository.findByUser(user);
+        
+        if(cartOptional.isPresent()) {
+        	Cart cart = cartOptional.get();
+        	
+        	List<CartItem> cartItems = cart.getCartItems();
+        	
+        	cartItemRepository.deleteAll(cartItems);
+        	
+        }*/
     }
 }

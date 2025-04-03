@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,76 +27,52 @@ import es.ullr.proyecto.service.UserDetailsServiceImpl;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
-	/*@Autowired
-    private JwtRequestFilter jwtRequestFilter;
-	
-	@SuppressWarnings({ "removal", "deprecation" })
-	@Bean
-	    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-	        http
-	            .csrf().disable() // Deshabilitar CSRF (útil para APIs REST)
-	            .authorizeRequests()
-	                .requestMatchers("/api/auth/**").permitAll() // Permitir acceso público a /api/auth/**
-	                .requestMatchers("/api/users/register").permitAll() // Permitir registro de usuarios
-	                .requestMatchers("/").permitAll()
-	                .anyRequest().authenticated() // Todas las demás rutas requieren autenticación
-	            .and()
-	            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // No usar sesiones
-	        
-	        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); 
-	            //.httpBasic(); // Usar autenticación básica (puedes cambiarla a JWT más adelante)
-
-	        return http.build();
-	    }
-
-	    @Bean
-	    public PasswordEncoder passwordEncoder() {
-	        return new BCryptPasswordEncoder(); // Codificador de contraseñas
-	    }
-	    
-	    @Bean
-	    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception 
-	    {
-	        return authenticationConfiguration.getAuthenticationManager();
-	    }*/
-	    
+ 
 	
 	 @Autowired
-	    private JwtRequestFilter jwtRequestFilter;
+	 private JwtRequestFilter jwtRequestFilter;
 
 		@Bean
 	    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-	        http
-	            .csrf().disable()
+	       /* http
 	            .authorizeRequests()
-	                .requestMatchers("/api/auth/**").permitAll() // Permitir acceso público a /api/auth/**
+	                .requestMatchers("/api/auth/login").permitAll() // Permitir acceso público a /api/auth/**
 	                .requestMatchers("/api/users/register").permitAll() // Permitir registro de usuarios
 	                .requestMatchers("/error").permitAll()
-	                .anyRequest().permitAll() // Todas las demás rutas requieren autenticación
+	                .anyRequest().authenticated() // Todas las demás rutas requieren autenticación
 	            .and()
-	            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // No usar sesiones
+	            .httpBasic().and()
+	            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+	            .csrf().disable(); // No usar sesiones
 
-	       http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-
-	        return http.build();
+	       http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);*/
+			
+			return http
+				.csrf(customizer-> customizer.disable())
+				.authorizeHttpRequests(request -> request
+						.requestMatchers("/api/users/register","/api/auth/login").permitAll()
+						.anyRequest().authenticated())
+				.oauth2Login(Customizer.withDefaults())
+				.httpBasic(Customizer.withDefaults())
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+				.build();
 	    }
 
-		/*@Bean
-	    public AuthenticationProvider authenticationProvider() {
+		@Bean
+	    public AuthenticationProvider authenticationProvider(UserDetailsServiceImpl userDetailsService) {
 	        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-	        UserDetailsServiceImpl userDetailsService = new UserDetailsServiceImpl();
 			authProvider.setUserDetailsService(userDetailsService);
 	        authProvider.setPasswordEncoder(passwordEncoder());
 	        return authProvider;
-	    }*/
+	    }
 		
 	    @Bean
 	    public PasswordEncoder passwordEncoder() {
 	        return new BCryptPasswordEncoder();
 	    }
 
-	    @Bean
+	   @Bean
 	    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
 	        return authenticationConfiguration.getAuthenticationManager();
 	    }

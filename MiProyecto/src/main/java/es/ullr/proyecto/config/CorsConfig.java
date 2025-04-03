@@ -14,7 +14,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**") // Permite CORS en todas las rutas que comiencen con /api
-                        .allowedOrigins("http://localhost:8081") // Permite solicitudes desde el frontend
+                        .allowedOrigins("http://localhost:8080","http://localhost:5173") // Permite solicitudes desde el frontend
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*")
                         .allowCredentials(true);

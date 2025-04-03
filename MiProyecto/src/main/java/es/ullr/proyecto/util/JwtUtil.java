@@ -17,27 +17,19 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtUtil 
 {
-
-	@SuppressWarnings("deprecation")
-	private static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256); // Clave secreta para firmar el token
+	
+	private static final Key SECRET_KEY =  Jwts.SIG.HS256.key().build(); // Clave secreta para firmar el token
 	private static final long EXPIRATION_TIME = 86400000; // 24 horas en milisegundos
 
 	
-	// Generar un token JWT
-	public String generateToken(UserDetails userDetails) 
-	{
-		Map<String, Object> claims = new HashMap<>();
-		return createToken(claims, userDetails.getUsername());
-	}
-	
 	 // Crear un token JWT
-	private String createToken(Map<String, Object> claims, String subject) 
+	public String createToken(Map<String, Object> claims, String subject) 
 	{
 		return Jwts.builder()
-				.setClaims(claims)
-				.setSubject(subject)
-				.setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+				.claims(claims)
+				.subject(subject)
+				.issuedAt(new Date(System.currentTimeMillis()))
+				.expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME * 12))
 				.signWith(SECRET_KEY)
 				.compact();
 	}
