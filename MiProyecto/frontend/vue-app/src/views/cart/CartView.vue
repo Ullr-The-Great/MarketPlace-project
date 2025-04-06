@@ -49,6 +49,7 @@
   import { useCartStore } from '@/stores/cartStore';
   import { useAuthStore } from '@/stores/authStore';
   import { onMounted } from 'vue';
+import type { CartItem } from '@/types/cart';
   
   const cartStore = useCartStore();
   const authStore = useAuthStore();

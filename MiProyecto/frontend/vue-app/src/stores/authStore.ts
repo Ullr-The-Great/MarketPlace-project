@@ -12,7 +12,7 @@ export const useAuthStore = defineStore('auth', {
     error: null as string | null,
   }),
   actions: {
-    async login(credentials: { email: string; password: string}) {
+    async login(credentials: { username: string; password: string}) {
       this.loading = true;
       try {
         const response = await api.post('/auth/login', credentials);

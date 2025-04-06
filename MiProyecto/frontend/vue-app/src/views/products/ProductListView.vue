@@ -1,6 +1,7 @@
 <template>
+  <Suspense>
     <div class="products">
-        <h1>HOLA</h1>
+        <button>  <FontAwesomeIcon :icon="fas.faHouse" /></button>
       <div class="filters">
         <input
           v-model="searchQuery"
@@ -31,9 +32,12 @@
         />
       </div>
     </div>
+  </Suspense>
   </template>
   
   <script setup lang="ts">
+  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { fas, fad, fass, fasds } from '@awesome.me/kit-KIT_CODE/icons'
   import { ref, onMounted } from 'vue';
   import { useProductStore } from '../../stores/productStore';
   import ProductCard from '../../components/products/ProductCard.vue';

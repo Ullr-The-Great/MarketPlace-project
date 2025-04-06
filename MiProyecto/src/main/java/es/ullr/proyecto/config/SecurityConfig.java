@@ -52,7 +52,6 @@ public class SecurityConfig {
 				.authorizeHttpRequests(request -> request
 						.requestMatchers("/api/users/register","/api/auth/login").permitAll()
 						.anyRequest().authenticated())
-				.oauth2Login(Customizer.withDefaults())
 				.httpBasic(Customizer.withDefaults())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
