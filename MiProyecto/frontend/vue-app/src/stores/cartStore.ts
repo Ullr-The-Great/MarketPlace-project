@@ -2,27 +2,20 @@ import { defineStore } from 'pinia';
 import api from '@/services/api';
 import type { Cart, CartItem } from '@/types/cart';
 import type { Product } from '@/types/product';
+import { useAuthStore } from './authStore';
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
+    cartItems: [] as CartItem[],
     currentCart: null as Cart | null,
     loading: false,
     error: null as string | null
   }),
   getters: {
-    totalItems(): number {
-      return this.currentCart?.cartItems.reduce(
-        (sum, item) => sum + item.quantity, 0
-      ) || 0;
-    },
-    totalPrice(): number {
-      return this.currentCart?.cartItems.reduce(
-        (sum, item) => sum + (item.product.price * item.quantity), 0
-      ) || 0;
-    },
-    cartItems(): CartItem[] {
-      return this.currentCart?.cartItems || [];
-    }
+    totalItems: (state) => state.cartItems.reduce(
+      (sum, item) => sum + item.quantity, 0),
+    totalPrice: (state) => state.cartItems.reduce(
+      (sum, item) => sum + (item.product.price * item.quantity), 0),
   },
   actions: {
     async fetchCart(userId: number) {
@@ -38,37 +31,34 @@ export const useCartStore = defineStore('cart', {
     },
     async addToCart(product: Product, quantity: number = 1) {
       if (!this.currentCart) {
-        throw new Error('No cart initialized');
+          throw new Error('No cart initialized');
       }
       
       this.loading = true;
       try {
-        const response = await api.post(
-          `/carts/${this.currentCart.id}/items`,
-          { productId: product.id, quantity }
-        );
-        
-        // Actualizar el carrito local con la respuesta
-        const existingItem = this.currentCart.cartItems.find(
-          item => item.product.id === product.id
-        );
-        
-        if (existingItem) {
-          existingItem.quantity += quantity;
-        } else {
-          this.currentCart.cartItems.push({
-            id: response.data.id,
-            product,
-            quantity
-          });
-        }
+          const response = await api.post(
+              `/carts/${this.currentCart.id}/items`,
+              { productId: product.id, quantity }
+          );
+          
+          // Actualizar estado local
+          const existingItem = this.cartItems.find(
+              item => item.product.id === product.id
+          );
+          
+          if (existingItem) {
+              existingItem.quantity += quantity;
+          } else {
+              this.cartItems.push(response.data);
+          }
+          return response.data;
       } catch (error) {
-        this.error = error instanceof Error ? error.message : 'Unknown error';
-        throw error;
+          console.error('Error adding to cart:', error);
+          throw error;
       } finally {
-        this.loading = false;
+          this.loading = false;
       }
-    },
+  },
     async removeFromCart(productId: number) {
       if (!this.currentCart) {
         throw new Error('No cart initialized');

@@ -34,7 +34,7 @@ const handleLogin = async () => {
       username: username.value,
       password: password.value
     });
-    router.push('/');
+    console.log(username.value, password.value);
   } catch (error) {
     // El error ya está manejado en el store
   }

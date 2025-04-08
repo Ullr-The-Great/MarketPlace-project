@@ -15,17 +15,22 @@ export const useAuthStore = defineStore('auth', {
     async login(credentials: { username: string; password: string}) {
       this.loading = true;
       try {
-        const response = await api.post('/auth/login', credentials);
+        const response = await api.post('/auth/login', {username:credentials.username, password: credentials.password});
         this.token = response.data.token;
         this.user = response.data.user;
+        console.log("hola desde antes de token")
+
         if (this.token) {
           localStorage.setItem('auth_token', this.token);
+          console.log("Hola desde el login con token")
         }
         const cartStore = useCartStore();
         if (this.user?.id !== undefined) {
           await cartStore.initializeCart(this.user.id);
         }
-        router.push("/");
+        if (router.currentRoute.value.path === '/login') {
+          router.push('/');
+      }
       } catch (error) {
         this.error = error instanceof Error? error.message : 'Login failed';
         throw error;
@@ -47,27 +52,20 @@ export const useAuthStore = defineStore('auth', {
       router.push('/login');
     },
     async checkAuth() {
-      const token = localStorage.getItem("auth_token");
-      if(token){
-        try{
-          this.loading = true;
-          const response = await api.get('/auth/me');
-          this.user = response.data;
-          this.token = token;
-
-          // Inicializar carrito del usuario
-          const cartStore = useCartStore();
-          if(this.user?.id !== undefined){
-            await cartStore.initializeCart(this.user.id);
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+          try {
+              this.loading = true;
+              const response = await api.get('/auth/me');
+              this.user = response.data;
+              this.token = token;
+          } catch (error) {
+              this.logout();
+          } finally {
+              this.loading = false;
           }
-          
-        } catch (error) {
-          this.logout();
-        } finally {
-          this.loading = false;
-        }
       }
-    }
+  },
   },
   getters: {
     isAuthenticated: (state) => !state.user

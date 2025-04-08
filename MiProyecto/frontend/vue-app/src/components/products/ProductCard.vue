@@ -42,7 +42,10 @@
   }
 
   try{
-    await cartStore.addToCart(props.product);
+    cartStore.addToCart(props.product)
+    .then(()=>{
+      console.log('Producto añadido')
+    });
   }catch (err) {
       err
   }

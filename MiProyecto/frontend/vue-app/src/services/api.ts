@@ -9,7 +9,7 @@ const api = axios.create({
 
 api.interceptors.request.use(config => {
   const authStore = useAuthStore();
-  const token = authStore.token || localStorage.getItem('auth_token');
+  const token = localStorage.getItem('auth_token');
   
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -21,9 +21,9 @@ api.interceptors.request.use(config => {
 api.interceptors.response.use(
   response => response,
   error => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 || error.response?.status === 403) {
       const authStore = useAuthStore();
-      authStore.logout();
+      //authStore.logout();
     }
     return Promise.reject(error);
   }
