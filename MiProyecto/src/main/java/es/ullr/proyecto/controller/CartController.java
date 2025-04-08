@@ -1,5 +1,6 @@
 package es.ullr.proyecto.controller;
 
+import es.ullr.proyecto.dto.AddItemRequest;
 import es.ullr.proyecto.model.Cart;
 import es.ullr.proyecto.model.CartItem;
 import es.ullr.proyecto.model.Product;
@@ -29,16 +30,16 @@ public class CartController
     @Autowired
     private ProductService productService;
 
-    /*
+   
     // Crear un carrito para un usuario
     @PostMapping("/user/{userId}")
     public ResponseEntity<Cart> createCart(@PathVariable Long userId) 
     {
         User user = userService.findByUsername(userId.toString()).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        Cart cart = cartService.createCart(user);
+        Cart cart = cartService.getOrCreateCart(user);
         return new ResponseEntity<>(cart, HttpStatus.CREATED);
     }
-
+    
     // Añadir un producto al carrito
     @PostMapping("/{cartId}/add")
     public ResponseEntity<CartItem> addProductToCart(@PathVariable Long cartId, @RequestParam Long productId, @RequestParam int quantity) 
@@ -57,7 +58,7 @@ public class CartController
         Cart cart = cartService.findCartById(cartId).orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
         cartService.removeProductFromCart(cart, product);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        
+    } 
     // Obtener los ítems del carrito
     @GetMapping("/{cartId}/items")
     public ResponseEntity<List<CartItem>> getCartItems(@PathVariable Long cartId) 
@@ -66,11 +67,7 @@ public class CartController
         List<CartItem> cartItems = cartService.getCartItems(cart);
         return new ResponseEntity<>(cartItems, HttpStatus.OK);
     }
-    }*/
 
-   /* 
-    */
-    
  // Obtener carrito del usuario actual
     @GetMapping
     public ResponseEntity<Cart> getCart(Authentication authentication) {
@@ -81,6 +78,32 @@ public class CartController
             .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
             
         return ResponseEntity.ok(cart);
+    }
+
+    
+    // Versión mejorada con manejo de errores
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getCartByUserId(
+            @PathVariable Long userId,
+            Authentication authentication) {
+        
+        try {
+            // Verificar que el usuario autenticado coincide con el userId solicitado
+            User authenticatedUser = userService.findByUsername(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("Usuario no autenticado"));
+                
+            if (authenticatedUser.getId() != (userId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No autorizado");
+            }
+            
+            Cart cart = cartService.findCartById(userId)
+                .orElseGet(() -> cartService.getOrCreateCart(authenticatedUser));
+                
+            return ResponseEntity.ok(cart);
+            
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
     
  // Añadir producto al carrito
@@ -102,6 +125,34 @@ public class CartController
         return ResponseEntity.ok(item);
     }
 
+ // Endpoint corregido para añadir items
+    @PostMapping("/{cartId}/items")
+    public ResponseEntity<CartItem> addItemToCart(
+        @PathVariable Long cartId,
+        @RequestBody AddItemRequest request,
+        Authentication authentication
+    ) {
+        // Verificar autenticación y autorización
+        User user = userService.findByUsername(authentication.getName())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            
+        // Verificar que el carrito pertenece al usuario
+        Cart cart = cartService.findCartById(cartId)
+            .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
+            
+        if (cart.getUser().getId() != (user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        
+        Product product = productService.findProductById(request.getProductId())
+            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+            
+        CartItem item = cartService.addProductToCart(cart, product, request.getQuantity());
+        
+        return ResponseEntity.ok(item);
+    }
+
+    
     // Eliminar producto del carrito
     @DeleteMapping("/items/{itemId}")
     public ResponseEntity<Void> removeItem(

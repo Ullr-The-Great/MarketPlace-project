@@ -47,13 +47,21 @@ public class AuthenticationController {
         
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+
+        final User user = userRepository.findByUsername(authenticationRequest.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
         
         Map<String, Object> claims = new HashMap<>();
         claims.put("username", userDetails.getUsername());
         
         final String jwt = jwtUtil.createToken(claims, userDetails.getUsername());
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        response.put("token", jwt);
+        response.put("user", user);
 
-        return ResponseEntity.ok(jwt);
+        return ResponseEntity.ok(response);
 	    }catch (BadCredentialsException e) {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
 	    }

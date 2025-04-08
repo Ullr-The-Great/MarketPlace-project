@@ -51,6 +51,16 @@ public class CartService {
                 return cartRepository.save(newCart);
             });
     }
+    
+    public Cart findOrCreateCartById(Long id) {
+        return cartRepository.findById(id)
+            .orElseGet(() -> {
+                Cart newCart = new Cart();
+                newCart.setId(id);
+                return cartRepository.save(newCart);
+            });
+    }
+
 
     public CartItem addProductToCart(Cart cart, Product product, int quantity) {
         Optional<CartItem> existingCartItem = cartItemRepository.findByCartAndProduct(cart, product);

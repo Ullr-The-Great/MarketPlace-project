@@ -48,11 +48,16 @@ public class SecurityConfig {
 	       http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);*/
 			
 			return http
+				.cors().and()
 				.csrf(customizer-> customizer.disable())
 				.authorizeHttpRequests(request -> request
-						.requestMatchers("/api/users/register","/api/auth/login").permitAll()
+						.requestMatchers("/api/users/register"
+										,"/api/auth/login"
+										,"/api/products"
+										,"/api/categories"
+										,"/api/auth/me")
+										.permitAll()
 						.anyRequest().authenticated())
-				.httpBasic(Customizer.withDefaults())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
 				.build();
