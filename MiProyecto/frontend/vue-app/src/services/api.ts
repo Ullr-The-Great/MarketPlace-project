@@ -23,7 +23,8 @@ api.interceptors.response.use(
   error => {
     if (error.response?.status === 401 || error.response?.status === 403) {
       const authStore = useAuthStore();
-      //authStore.logout();
+      authStore.logout();
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }

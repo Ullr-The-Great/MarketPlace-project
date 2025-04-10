@@ -132,26 +132,23 @@ public class CartController
         @RequestBody AddItemRequest request,
         Authentication authentication
     ) {
-        // Verificar autenticación y autorización
         User user = userService.findByUsername(authentication.getName())
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-            
-        // Verificar que el carrito pertenece al usuario
+        
         Cart cart = cartService.findCartById(cartId)
             .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
-            
-        if (cart.getUser().getId() != (user.getId())) {
+        
+        if (cart.getUser().getId() !=user.getId()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         
         Product product = productService.findProductById(request.getProductId())
             .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-            
+        
         CartItem item = cartService.addProductToCart(cart, product, request.getQuantity());
         
         return ResponseEntity.ok(item);
     }
-
     
     // Eliminar producto del carrito
     @DeleteMapping("/items/{itemId}")

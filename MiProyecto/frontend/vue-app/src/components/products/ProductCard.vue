@@ -11,8 +11,8 @@
           Stock: {{ product.stock }}
         </div>
         <button 
-          @click="handlerAddToCart" 
-          :disabled="product.stock === 0"
+          @click="handleAddToCart"
+          :disabled= "addingToCart"
         >
           {{ product.stock > 0 ? 'Add to cart' : 'Out of stock' }}
         </button>
@@ -25,30 +25,34 @@
   import { useAuthStore } from '@/stores/authStore';
   import { useCartStore } from '@/stores/cartStore';
   import { useRouter } from 'vue-router';
+  import { ref } from 'vue';
 
   const props = defineProps<{
     product: Product;
   }>();
 
   const cartStore = useCartStore();
-  const authStore = useAuthStore();
-  const router = useRouter();
+  const addingToCart = ref(false);
 
-  const handlerAddToCart = () => {
-    if (!authStore.isAuthenticated) {
-      router.push({ name:'/login', query: { redirect: router.currentRoute.value.fullPath } });
-      return;
+  const handleAddToCart = async () => {
+  if (addingToCart.value) return;
+  
+  addingToCart.value = true;
+  
+  try {
+
+    if (!props.product?.id) {
+      throw new Error('Producto inválido');
     }
-  }
 
-  try{
-    cartStore.addToCart(props.product)
-    .then(()=>{
-      console.log('Producto añadido')
-    });
-  }catch (err) {
-      err
+    await cartStore.addToCart(props.product);
+    console.log("Producto añadido correctamente");
+  } catch (error) {
+    console.error("Error al añadir:", error);
+  } finally {
+    addingToCart.value = false;
   }
+};
   </script>
 
   <style scoped>

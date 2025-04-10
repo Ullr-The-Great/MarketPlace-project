@@ -17,9 +17,6 @@
         </option>
       </select>
 
-      <button @click="goToCart" class="cart-button">
-        🛒 Ver Carrito ({{ cartStore.totalItems }})
-      </button>
     </div>
 
     <div v-if="productStore.loading">Loading products...</div>
@@ -40,6 +37,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useProductStore } from '@/stores/productStore';
@@ -54,6 +52,11 @@ const router = useRouter();
 
 const searchQuery = ref('');
 const selectedCategoryId = ref<number | null>(null);
+
+  const cartItemCount = computed(() => {
+  const count = cartStore.totalItems;
+  return isNaN(count) ? 0 : count;
+});
 
 // Cargar datos iniciales
 onMounted(async () => {
@@ -84,6 +87,8 @@ const goToCart = () => {
   }
   router.push({ name: 'cart' });
 };
+
+
 </script>
 
 <style scoped>

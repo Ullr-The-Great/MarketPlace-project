@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import api from "@/services/api.ts"
-import type { User } from "@/types/user.ts";
+import api from "@/services/api"
+import type { User } from "@/types/user";
 import { useCartStore } from './cartStore';
 import router from '@/router';
 
@@ -22,14 +22,14 @@ export const useAuthStore = defineStore('auth', {
 
         if (this.token) {
           localStorage.setItem('auth_token', this.token);
-          console.log("Hola desde el login con token")
+          console.log("Hola desde el login con token",localStorage.getItem("auth_token"))
         }
         const cartStore = useCartStore();
         if (this.user?.id !== undefined) {
           await cartStore.initializeCart(this.user.id);
         }
         if (router.currentRoute.value.path === '/login') {
-          router.push('/');
+          router.push('/products');
       }
       } catch (error) {
         this.error = error instanceof Error? error.message : 'Login failed';

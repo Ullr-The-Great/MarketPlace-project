@@ -1,5 +1,6 @@
-<script setup lang="ts">
+<script setup>
 import { RouterLink, RouterView } from 'vue-router'
+import AppNavbar from '@/components/AppNavbar.vue';
 </script>
 
 <template>
@@ -13,6 +14,12 @@ import { RouterLink, RouterView } from 'vue-router'
         <RouterLink to="/about">About</RouterLink>
         <RouterLink to="/products">Products</RouterLink>
       </nav>
+    
+      <div id="app">
+    <AppNavbar />
+    <main class="main-content">    </main>
+    
+  </div>
     </div>
   </header>
 
@@ -55,6 +62,20 @@ nav a:first-of-type {
   border: 0;
 }
 
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
 @media (min-width: 1024px) {
   header {
     display: flex;
@@ -81,4 +102,5 @@ nav a:first-of-type {
     margin-top: 1rem;
   }
 }
+
 </style>
