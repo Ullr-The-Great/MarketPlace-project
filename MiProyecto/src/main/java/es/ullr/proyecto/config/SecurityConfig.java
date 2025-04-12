@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,7 +23,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.service.annotation.HttpExchange;
 
 import es.ullr.proyecto.filter.JwtRequestFilter;
+import es.ullr.proyecto.service.MyTokenService;
 import es.ullr.proyecto.service.UserDetailsServiceImpl;
+import es.ullr.proyecto.util.JwtUtil;
 
 @Configuration
 @EnableWebSecurity
@@ -31,22 +34,15 @@ public class SecurityConfig {
 	
 	 @Autowired
 	 private JwtRequestFilter jwtRequestFilter;
+	
+	 @Autowired
+	 private JwtUtil jwtUtil;
+	 
+	 @Autowired
+	 private MyTokenService tokenService;
 
 		@Bean
 	    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-	       /* http
-	            .authorizeRequests()
-	                .requestMatchers("/api/auth/login").permitAll() // Permitir acceso público a /api/auth/**
-	                .requestMatchers("/api/users/register").permitAll() // Permitir registro de usuarios
-	                .requestMatchers("/error").permitAll()
-	                .anyRequest().authenticated() // Todas las demás rutas requieren autenticación
-	            .and()
-	            .httpBasic().and()
-	            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-	            .csrf().disable(); // No usar sesiones
-
-	       http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);*/
-			
 			return http
 				.cors().and()
 				.csrf(customizer-> customizer.disable())
@@ -60,6 +56,15 @@ public class SecurityConfig {
 						.anyRequest().authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+				.logout(customizer -> customizer
+						.logoutUrl("/api/auth/logout")
+		                .addLogoutHandler((request, response, auth) -> {
+		                    String token = jwtUtil.extractToken(request);
+		                    tokenService.invalidateToken(token);
+		                })
+		                .logoutSuccessHandler((request, response, auth) -> {
+		                    SecurityContextHolder.clearContext();
+		                }))
 				.build();
 	    }
 

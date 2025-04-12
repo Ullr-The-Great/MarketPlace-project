@@ -26,6 +26,7 @@
   import { useCartStore } from '@/stores/cartStore';
   import { useRouter } from 'vue-router';
   import { ref } from 'vue';
+import router from '@/router';
 
   const props = defineProps<{
     product: Product;
@@ -48,11 +49,12 @@
     await cartStore.addToCart(props.product);
     console.log("Producto añadido correctamente");
   } catch (error) {
-    console.error("Error al añadir:", error);
+    console.log("error en product card", error)
+    router.push('/login');
   } finally {
     addingToCart.value = false;
   }
-};
+}
   </script>
 
   <style scoped>

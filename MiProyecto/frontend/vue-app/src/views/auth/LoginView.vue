@@ -34,7 +34,6 @@ const handleLogin = async () => {
       username: username.value,
       password: password.value
     });
-    console.log(username.value, password.value);
   } catch (error) {
     // El error ya está manejado en el store
   }

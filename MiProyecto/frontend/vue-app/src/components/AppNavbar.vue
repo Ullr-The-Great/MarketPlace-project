@@ -8,7 +8,6 @@
           <router-link to="/cart">
             Cart ({{ cartStore.totalItems }})
           </router-link>
-          <button @click="authStore.logout">Logout</button>
           <span>Hi, {{ authStore.user?.username }}</span>
         </template>
         <template v-else>
@@ -16,6 +15,7 @@
         </template>
         <div class="navbar-actions">
         <CartIndicator />
+        <LogoutButton/>
       </div>
       </div>
     </nav>
@@ -25,6 +25,7 @@
   import { useAuthStore } from '@/stores/authStore';
   import { useCartStore } from '@/stores/cartStore';
   import CartIndicator from '@/components/CartIndicator.vue';
+  import LogoutButton from './LogoutButton.vue';
   
   const authStore = useAuthStore();
   const cartStore = useCartStore();

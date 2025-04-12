@@ -3,6 +3,7 @@ import api from "@/services/api"
 import type { User } from "@/types/user";
 import { useCartStore } from './cartStore';
 import router from '@/router';
+import { useRouter } from 'vue-router';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -18,19 +19,23 @@ export const useAuthStore = defineStore('auth', {
         const response = await api.post('/auth/login', {username:credentials.username, password: credentials.password});
         this.token = response.data.token;
         this.user = response.data.user;
-        console.log("hola desde antes de token")
+
+        console.log("Desde antes en authStore", this.token)
 
         if (this.token) {
           localStorage.setItem('auth_token', this.token);
-          console.log("Hola desde el login con token",localStorage.getItem("auth_token"))
+          console.log("Desde this.token authStore", localStorage.getItem('auth_token'))
         }
-        const cartStore = useCartStore();
-        if (this.user?.id !== undefined) {
-          await cartStore.initializeCart(this.user.id);
-        }
+        
         if (router.currentRoute.value.path === '/login') {
           router.push('/products');
       }
+      
+      const cartStore= useCartStore();
+      if(this.user){
+        cartStore.initializeCart(this.user.id);
+      }
+      return response;
       } catch (error) {
         this.error = error instanceof Error? error.message : 'Login failed';
         throw error;
@@ -40,16 +45,38 @@ export const useAuthStore = defineStore('auth', {
       
     },
     async logout() {
-      this.token = null;
-      this.user = null;
-      localStorage.removeItem('auth_token');
+      try{
+        if (this.token) {
+          await api.post('/auth/logout');
+        }
+  
+        // Limpiar carrito
+        const cartStore = useCartStore();
+        cartStore.$reset();
+        cartStore.clearCart();
 
-      // Limpiar carrito
-      const cartStore = useCartStore();
-      cartStore.clearCart();
+        // Redirigir a login
+        router.push('/login');
+      } catch (error) {
+        console.error("Error during logout:", error);
+      }
+      finally{
+        // Limpiar estado
+        this.token = null;
+        this.user = null;
+        localStorage.removeItem('auth_token');
+        
+        // Resetear carrito
+        const cartStore = useCartStore();
+        cartStore.$reset();
+        
+        // Redirigir a login
+       
+        const router = useRouter();
+        this.clearAuth();
+       
+      }
       
-      // Redirigir a login
-      router.push('/login');
     },
     async checkAuth() {
       const token = localStorage.getItem('auth_token');
@@ -66,6 +93,17 @@ export const useAuthStore = defineStore('auth', {
           }
       }
   },
+  clearAuth() {
+    this.token = null;
+    this.user = null;
+    localStorage.removeItem('auth_token');
+    
+    // Limpiar carrito
+    const cartStore = useCartStore();
+    cartStore.$reset();
+    
+    // No redirigir aquí, dejar que el componente lo maneje
+  }
   },
   getters: {
     isAuthenticated: (state) => !state.user

@@ -1,6 +1,7 @@
 package es.ullr.proyecto.controller;
 
 import es.ullr.proyecto.dto.AddItemRequest;
+import es.ullr.proyecto.dto.CartResponse;
 import es.ullr.proyecto.model.Cart;
 import es.ullr.proyecto.model.CartItem;
 import es.ullr.proyecto.model.Product;
@@ -14,7 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/carts")
@@ -59,16 +63,17 @@ public class CartController
         cartService.removeProductFromCart(cart, product);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     } 
+    
     // Obtener los ítems del carrito
     @GetMapping("/{cartId}/items")
-    public ResponseEntity<List<CartItem>> getCartItems(@PathVariable Long cartId) 
-    {
-        Cart cart = cartService.findCartById(cartId).orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
-        List<CartItem> cartItems = cartService.getCartItems(cart);
-        return new ResponseEntity<>(cartItems, HttpStatus.OK);
+    public ResponseEntity<CartResponse> getCartItems(@PathVariable Long cartId) {
+        Cart cart = cartService.findCartById(cartId)
+                .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
+        
+        return ResponseEntity.ok(new CartResponse(cart));
     }
-
- // Obtener carrito del usuario actual
+    
+    // Obtener carrito del usuario actual
     @GetMapping
     public ResponseEntity<Cart> getCart(Authentication authentication) {
         User user = userService.findByUsername(authentication.getName())

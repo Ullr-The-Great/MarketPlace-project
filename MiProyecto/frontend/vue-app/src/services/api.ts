@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { useAuthStore } from '@/stores/authStore';
+import { useRouter } from 'vue-router';
+import { useCartStore } from '@/stores/cartStore';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
@@ -8,23 +10,23 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(config => {
-  const authStore = useAuthStore();
   const token = localStorage.getItem('auth_token');
-  
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  
+
   return config;
 });
 
 api.interceptors.response.use(
   response => response,
-  error => {
+ async error => {
+  const authStore = useAuthStore();
+  const router = useRouter();
     if (error.response?.status === 401 || error.response?.status === 403) {
-      const authStore = useAuthStore();
-      authStore.logout();
-      window.location.href = "/login";
+      router.push({ path: '/login', query: { sessionExpired: 'true' } });
+      await authStore.logout();
     }
     return Promise.reject(error);
   }

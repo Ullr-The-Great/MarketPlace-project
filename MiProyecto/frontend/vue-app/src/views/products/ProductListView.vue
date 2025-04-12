@@ -62,6 +62,7 @@ const selectedCategoryId = ref<number | null>(null);
 onMounted(async () => {
   await productStore.fetchProducts();
   await productStore.fetchCategories();
+  console.log("hola desde mounted productList", productStore.product)
 });
 
 const handleSearch = () => {
@@ -78,17 +79,7 @@ const handleCategoryChange = () => {
   } else {
     productStore.fetchProducts();
   }
-};
-
-const goToCart = () => {
-  if (!authStore.isAuthenticated) {
-    router.push({ name: 'login', query: { redirect: '/cart' } });
-    return;
-  }
-  router.push({ name: 'cart' });
-};
-
-
+}
 </script>
 
 <style scoped>

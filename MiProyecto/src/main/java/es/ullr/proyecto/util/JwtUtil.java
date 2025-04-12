@@ -13,6 +13,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Component
 public class JwtUtil 
@@ -65,6 +66,16 @@ public class JwtUtil
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+    
+    // Método para extraer el token del request
+    public String extractToken(HttpServletRequest request) {
+        final String authorizationHeader = request.getHeader("Authorization");
+        
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7);
+        }
+        return null;
     }
 	
     // Verificar si el token ha expirado
