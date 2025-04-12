@@ -20,12 +20,17 @@ import { useAuthStore } from '@/stores/authStore';
     return cartStore.totalItems || 0;
   });
 
-  const goToCart = () => {
-  if (!authStore.isAuthenticated) {
-    router.push({ name: 'login', query: { redirect: '/cart' } });
-    return;
+  const goToCart = async () => {
+  try {
+    router.push({ name: 'cart' }); 
+
+  } catch (error:any) {
+    console.error('Error al ir al carrito:', error);
+    // Opcional: redirigir a login si hay error de autenticación
+    if (error.response?.status === 401) {
+      router.push('/login');
+    }
   }
-  router.push({ name: 'cart' });
 };
   </script>
   

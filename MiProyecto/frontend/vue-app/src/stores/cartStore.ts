@@ -3,32 +3,33 @@ import api from '@/services/api';
 import type { Cart, CartItem } from '@/types/cart';
 import type { Product } from '@/types/product';
 import { useAuthStore } from './authStore';
+import { CartResponse } from '@/types/cartResponse';
 
 
 
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
-    currentCart: null as Cart | null,
+    currentCart: null as CartResponse | null,
     loading: false,
     error: null as string | null
   }),
   getters: {
     cartItems():CartItem[]{
-      return this.currentCart?.cartItems || [];
+      return this.currentCart?.items || [];
     },
     totalItems(): number {
-      if (!this.currentCart?.cartItems) return 0;
-      const total = this.cartItems.reduce((sum, item) => {
-        const qty = Number(item.quantity) || 0;
-        return sum + qty;
+      if (!this.currentCart?.items) return 0;
+      return this.currentCart.items.reduce((total, item) => {
+        return total + (item.quantity || 0);
       }, 0);
-      return isNaN(total) ? 0 : total;
     },
     totalPrice(): number {
-      if (!this.currentCart?.cartItems) return 0;
-      return this.cartItems.reduce((total, item) => {
-        return total + (item.product?.price || 0) * (item.quantity || 0);
+      if (!this.currentCart?.items) return 0;
+      return this.currentCart.items.reduce((total, item) => {
+        const price = item.product?.price || 0;
+        const quantity = item.quantity || 0;
+        return total + (price * quantity);
       }, 0);
     },
   },
@@ -36,7 +37,7 @@ export const useCartStore = defineStore('cart', {
     async fetchCart(cartId: number) {
       this.loading = true;
       try {
-        const response = await api.get(`/carts/${cartId}/items`);
+        const response = await api.get<CartResponse>(`/carts/${cartId}/items`);
         this.currentCart = response.data;
         console.log(response.data)
         // No necesitas calcular totalItems, ya viene del backend
@@ -63,15 +64,15 @@ export const useCartStore = defineStore('cart', {
               { productId: product.id, quantity }
           );
                     
-        const existingItem = this.currentCart.cartItems?.find(
+        const existingItem = this.currentCart.items?.find(
           item => item.product?.id === product.id
         );
         
         if (existingItem) {
           existingItem.quantity += quantity;
         } else {
-          this.currentCart.cartItems = [
-            ...(this.currentCart.cartItems || []),
+          this.currentCart.items = [
+            ...(this.currentCart.items || []),
             response.data
           ];
         }
@@ -95,7 +96,7 @@ export const useCartStore = defineStore('cart', {
         );
         
         // Actualizar el carrito local
-        this.currentCart.cartItems = this.currentCart.cartItems.filter(
+        this.currentCart.items = this.currentCart.items.filter(
           item => item.product.id !== productId
         );
       } catch (error) {
@@ -114,7 +115,7 @@ export const useCartStore = defineStore('cart', {
         );
         
         // Actualizar el carrito local
-        const item = this.currentCart?.cartItems.find(i => i.id === itemId);
+        const item = this.currentCart?.items.find(i => i.id === itemId);
         if (item) {
           item.quantity = newQuantity;
         }
@@ -132,7 +133,7 @@ export const useCartStore = defineStore('cart', {
       try {
         console.log("Hola desde antes de borrar")
         await api.delete(`/carts/${this.currentCart.id}/items`);
-        this.currentCart.cartItems = [];
+        this.currentCart.items = [];
       } catch (error) {
         this.error = error instanceof Error ? error.message : 'Unknown error';
         throw error;

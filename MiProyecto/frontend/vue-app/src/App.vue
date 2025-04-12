@@ -10,14 +10,12 @@ import AppNavbar from '@/components/AppNavbar.vue';
     <div class="wrapper">
 
       <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
         <RouterLink to="/products">Products</RouterLink>
       </nav>
     
       <div id="app">
     <AppNavbar />
-    <main class="main-content">    </main>
+    <main class="main-content"> </main>
     
   </div>
     </div>
