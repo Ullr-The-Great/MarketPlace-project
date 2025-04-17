@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import api from '@/services/api';
 import type { Product } from '@/types/product.ts';
 import type { Category } from '@/types/category.ts';
+import { useAuthStore } from './authStore';
 
 
 export const useProductStore = defineStore('product', {

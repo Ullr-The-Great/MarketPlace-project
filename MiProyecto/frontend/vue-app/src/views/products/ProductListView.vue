@@ -1,91 +1,90 @@
 <template>
-    <div class="products">
-        <h1>HOLA</h1>
-      <div class="filters">
-        <input
-          v-model="searchQuery"
-          placeholder="Search products..."
-          @input="handleSearch"
+   <div class="filters">
+      <input
+        v-model="searchQuery"
+        placeholder="Search products..."
+        @input="handleSearch"
+      >
+      <select v-model="selectedCategoryId" @change="handleCategoryChange">
+        <option :value="null">All Categories</option>
+        <option 
+          v-for="category in productStore.categories" 
+          :key="category.id" 
+          :value="category.id"
         >
-        <select v-model="selectedCategoryId" @change="handleCategoryChange">
-          <option :value="null">All Categories</option>
-          <option 
-            v-for="category in productStore.categories" 
-            :key="category.id" 
-            :value="category.id"
-          >
-            {{ category.name }}
-          </option>
-        </select>
-      </div>
-  
+          {{ category.name }}
+        </option>
+      </select>
+    </div>
+  <div class="products">
+    <div class="product-cards">
       <div v-if="productStore.loading">Loading products...</div>
-      <div v-else-if="productStore.error" class="error">
-        Error: {{ productStore.error }}
-      </div>
-      <div v-else class="products-grid">
-        <ProductCard 
-          v-for="product in productStore.filteredProducts" 
-          :key="product.id" 
-          :product="product" 
-        />
+        <div v-else-if="productStore.error" class="error">
+          Error: {{ productStore.error }}
+        </div>
+        <div v-else-if="productStore.filteredProducts.length === 0" class="no-products">
+          No products found
+        </div>
+        <div v-else class="products-grid">
+          <ProductCard 
+            v-for="product in productStore.filteredProducts" 
+            :key="product.id" 
+            :product="product" 
+          />
+        </div>
       </div>
     </div>
-  </template>
-  
-  <script setup lang="ts">
-  import { ref, onMounted } from 'vue';
-  import { useProductStore } from '../../stores/productStore';
-  import ProductCard from '../../components/products/ProductCard.vue';
-  
-  const productStore = useProductStore();
-  
-  const searchQuery = ref('');
-  const selectedCategoryId = ref<number | null>(null);
-  
-  const handleSearch = () => {
-    if (searchQuery.value.length > 2) {
-      productStore.searchProducts(searchQuery.value);
-    } else if (searchQuery.value.length === 0) {
-      productStore.fetchProducts();
-    }
-  };
-  
-  const handleCategoryChange = () => {
-    if (selectedCategoryId.value) {
-      productStore.fetchProductsByCategory(selectedCategoryId.value);
-    } else {
-      productStore.fetchProducts();
-    }
-  };
-  
-  onMounted(async () => {
-    await productStore.fetchProducts();
-    await productStore.fetchCategories();
-  });
-  </script>
-  
-  <style scoped>
-  .product-list {
-    padding: 20px;
+   
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue';
+import { ref, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { useProductStore } from '@/stores/productStore';
+import { useCartStore } from '@/stores/cartStore';
+import { useAuthStore } from '@/stores/authStore';
+import ProductCard from '@/components/products/ProductCard.vue';
+
+const productStore = useProductStore();
+const cartStore = useCartStore();
+const authStore = useAuthStore();
+const router = useRouter();
+
+const searchQuery = ref('');
+const selectedCategoryId = ref<number | null>(null);
+
+  const cartItemCount = computed(() => {
+  const count = cartStore.totalItems;
+  return isNaN(count) ? 0 : count;
+});
+
+// Cargar datos iniciales
+onMounted(async () => {
+  await productStore.fetchProducts();
+  await productStore.fetchCategories();
+  console.log("hola desde mounted productList", productStore.product)
+});
+
+const handleSearch = () => {
+  if (searchQuery.value.length >= 1) {
+    productStore.searchProducts(searchQuery.value);
+  } else if (searchQuery.value.length === 0) {
+    productStore.fetchProducts();
   }
-  .filters {
-    margin-bottom: 20px;
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
+};
+
+const handleCategoryChange = () => {
+  if (selectedCategoryId.value) {
+    productStore.fetchProductsByCategory(selectedCategoryId.value);
+  } else {
+    productStore.fetchProducts();
   }
-  .products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-  }
-  .error {
-    color: red;
-  }
-  .price-range {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  </style>
+}
+</script>
+
+<style scoped>
+
+  @import "@/styles/product-list.css";
+
+</style>
