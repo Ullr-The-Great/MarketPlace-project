@@ -1,0 +1,11 @@
+:root {
+    /* ... tus variables existentes ... */
+    --skeleton-bg: #e0e0e0;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    :root {
+      /* ... tus variables existentes ... */
+      --skeleton-bg: #2d2d2d;
+    }
+  }

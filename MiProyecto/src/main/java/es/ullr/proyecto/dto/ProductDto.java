@@ -18,8 +18,13 @@ public class ProductDto {
     private String createdAt;
     
     public ProductDto(Product product) {
-        // Mapear todos los campos necesarios
-        this.category = new CategoryDto(product.getCategory());
+        this.id = product.getId();
+        this.name = product.getName();
+        this.price = product.getPrice();
+        this.description = product.getDescription();
+        this.stock = product.getStock();
+        this.createdAt = product.getCreatedAt() != null ? product.getCreatedAt().toString() : null;
+    	this.category = new CategoryDto(product.getCategory());
     }
 
 }

@@ -113,4 +113,16 @@ public class CartService {
         	
         }*/
     }
+    
+    public CartItem updateCartItemQuantity(Long cartItemId, int newQuantity) {
+        CartItem cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new RuntimeException("Cart item not found"));
+        
+        if (newQuantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than zero");
+        }
+        
+        cartItem.setQuantity(newQuantity);
+        return cartItemRepository.save(cartItem);
+    }
 }

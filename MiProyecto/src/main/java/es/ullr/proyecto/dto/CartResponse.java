@@ -17,7 +17,6 @@ public class CartResponse {
     private String createdAt;
     private List<CartItemDto> items;
     
-    // Constructor que acepta un Cart
     public CartResponse(Cart cart) {
         this.id = cart.getId();
         this.userId = cart.getUser().getId();
@@ -26,6 +25,5 @@ public class CartResponse {
                 .map(CartItemDto::new)
                 .collect(Collectors.toList());
     }
-    
-    // Getters
+
 }

@@ -58,45 +58,5 @@ import router from '@/router';
   </script>
 
   <style scoped>
-  .product-card {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 16px;
-    transition: transform 0.2s;
-  }
-  .product-card:hover {
-    transform: translateY(-5px);
-  }
-  .product-image-placeholder {
-    width: 100%;
-    height: 200px;
-    background-color: #f0f0f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3rem;
-    color: #666;
-    margin-bottom: 1rem;
-  }
-  .price {
-    font-weight: bold;
-    color: #2c3e50;
-    display: block;
-    margin: 8px 0;
-  }
-  .category {
-    color: #666;
-    font-size: 0.9rem;
-  }
-  .stock {
-    margin: 8px 0;
-    font-size: 0.9rem;
-  }
-  .low-stock {
-    color: #e74c3c;
-  }
-  button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
+    @import "@/styles/product-cards.css";
   </style>

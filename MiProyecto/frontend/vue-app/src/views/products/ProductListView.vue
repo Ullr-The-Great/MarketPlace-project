@@ -1,6 +1,5 @@
 <template>
-  <div class="products">
-    <div class="filters">
+   <div class="filters">
       <input
         v-model="searchQuery"
         placeholder="Search products..."
@@ -16,24 +15,26 @@
           {{ category.name }}
         </option>
       </select>
-
     </div>
-
-    <div v-if="productStore.loading">Loading products...</div>
-    <div v-else-if="productStore.error" class="error">
-      Error: {{ productStore.error }}
+  <div class="products">
+    <div class="product-cards">
+      <div v-if="productStore.loading">Loading products...</div>
+        <div v-else-if="productStore.error" class="error">
+          Error: {{ productStore.error }}
+        </div>
+        <div v-else-if="productStore.filteredProducts.length === 0" class="no-products">
+          No products found
+        </div>
+        <div v-else class="products-grid">
+          <ProductCard 
+            v-for="product in productStore.filteredProducts" 
+            :key="product.id" 
+            :product="product" 
+          />
+        </div>
+      </div>
     </div>
-    <div v-else-if="productStore.filteredProducts.length === 0" class="no-products">
-      No products found
-    </div>
-    <div v-else class="products-grid">
-      <ProductCard 
-        v-for="product in productStore.filteredProducts" 
-        :key="product.id" 
-        :product="product" 
-      />
-    </div>
-  </div>
+   
 </template>
 
 <script setup lang="ts">
@@ -66,7 +67,7 @@ onMounted(async () => {
 });
 
 const handleSearch = () => {
-  if (searchQuery.value.length > 2) {
+  if (searchQuery.value.length >= 1) {
     productStore.searchProducts(searchQuery.value);
   } else if (searchQuery.value.length === 0) {
     productStore.fetchProducts();
@@ -83,34 +84,7 @@ const handleCategoryChange = () => {
 </script>
 
 <style scoped>
-.products {
-  padding: 20px;
-}
-.filters {
-  margin-bottom: 20px;
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-.products-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-}
-.error {
-  color: red;
-}
-.cart-button {
-  padding: 8px 16px;
-  background-color: #42b983;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.no-products {
-  padding: 20px;
-  text-align: center;
-  font-style: italic;
-}
+
+  @import "@/styles/product-list.css";
+
 </style>

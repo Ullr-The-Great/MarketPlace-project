@@ -8,7 +8,7 @@
           <router-link to="/cart">
             Cart ({{ cartStore.totalItems }})
           </router-link>
-          <span>Hi, {{ authStore.user?.username }}</span>
+          <span>{{ authStore.user?.username }}</span>
         </template>
         <template v-else>
           <router-link to="/login">Login</router-link>
@@ -36,6 +36,10 @@
   background-color: #2c3e50;
   padding: 1rem 2rem;
   color: white;
+  display: flex;
+  justify-content: space-around;
+  height: 100px;
+  width: 100%;
 }
 
 .navbar-container {
@@ -73,4 +77,17 @@
   gap: 1rem;
   align-items: center;
 }
+
+.auth-section{
+  display: flex;
+  justify-content: space-between;
+  width: 2em;
+}
+
+.navbar-actions{
+  display: flex;
+  justify-content: space-evenly;
+  width: 300px;
+}
+
   </style>

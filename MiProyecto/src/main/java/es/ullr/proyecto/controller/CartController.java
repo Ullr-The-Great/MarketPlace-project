@@ -1,7 +1,9 @@
 package es.ullr.proyecto.controller;
 
 import es.ullr.proyecto.dto.AddItemRequest;
+import es.ullr.proyecto.dto.CartItemDto;
 import es.ullr.proyecto.dto.CartResponse;
+import es.ullr.proyecto.dto.UpdateQuantityRequest;
 import es.ullr.proyecto.model.Cart;
 import es.ullr.proyecto.model.CartItem;
 import es.ullr.proyecto.model.Product;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -86,7 +89,6 @@ public class CartController
     }
 
     
-    // Versión mejorada con manejo de errores
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getCartByUserId(
             @PathVariable Long userId,
@@ -111,26 +113,8 @@ public class CartController
         }
     }
     
- // Añadir producto al carrito
-    @PostMapping("/items")
-    public ResponseEntity<CartItem> addItem(
-        @RequestParam Long productId,
-        @RequestParam int quantity,
-        Authentication authentication
-    ) {
-        User user = userService.findByUsername(authentication.getName())
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-            
-        Product product = productService.findProductById(productId)
-            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-            
-        Cart cart = cartService.findOrCreateCart(user);
-        CartItem item = cartService.addProductToCart(cart, product, quantity);
-        
-        return ResponseEntity.ok(item);
-    }
 
- // Endpoint corregido para añadir items
+    // añadir items
     @PostMapping("/{cartId}/items")
     public ResponseEntity<CartItem> addItemToCart(
         @PathVariable Long cartId,
@@ -177,5 +161,28 @@ public class CartController
         cartService.clearCart(user);
         return ResponseEntity.noContent().build();
     }
-  
+    @PutMapping("/items/{itemId}")
+    public ResponseEntity<CartItemDto> updateCartItemQuantity(
+            @PathVariable Long itemId,
+            @RequestBody Map<String, Integer> request,
+            Authentication authentication) {
+        
+        // Obtener el username del principal
+        String username = authentication.getName();
+        
+        // Buscar el usuario real en tu servicio
+        User user = userService.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        
+        int newQuantity = request.get("quantity");
+        
+        CartItem updatedItem = cartService.updateCartItemQuantity(itemId, newQuantity);
+        
+        // Verificar que el item pertenece al carrito del usuario
+        if (updatedItem.getCart().getUser().getId() != (user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        
+        return ResponseEntity.ok(new CartItemDto(updatedItem));
+    }
 }

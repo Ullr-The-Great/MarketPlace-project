@@ -19,6 +19,4 @@ public class CartItemDto {
         this.product = new ProductDto(item.getProduct());
         this.quantity = item.getQuantity();
     }
-    
-    // Getters
 }

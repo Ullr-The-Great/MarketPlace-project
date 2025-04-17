@@ -27,6 +27,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401 || error.response?.status === 403) {
       router.push({ path: '/login', query: { sessionExpired: 'true' } });
       await authStore.logout();
+      console.log("Error desde la api.ts",error)
     }
     return Promise.reject(error);
   }
