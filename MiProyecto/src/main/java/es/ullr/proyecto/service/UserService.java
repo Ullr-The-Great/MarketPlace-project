@@ -19,8 +19,16 @@ public class UserService
     private PasswordEncoder passwordEncoder;
 
     public User createUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword())); // Codificar la contraseña
-        return userRepository.save(user);
+    	 if (user.getUsername() == null || user.getUsername().isEmpty()) {
+    	        throw new IllegalArgumentException("Username is required");
+    	    }
+    	    
+    	    if (user.getPassword() == null || user.getPassword().isEmpty()) {
+    	        throw new IllegalArgumentException("Password is required");
+    	    }
+    	    
+    	    user.setPassword(passwordEncoder.encode(user.getPassword()));
+    	    return userRepository.save(user);
     }
 
     public Optional<User> findByUsername(String username) {
@@ -40,5 +48,7 @@ public class UserService
     	
     	userRepository.deleteById(id);
     }
+    
+    
     
 }

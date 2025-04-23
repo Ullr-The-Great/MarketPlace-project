@@ -1,7 +1,23 @@
 <template>
   <div class="cart-container">
     
-    <div class="cart-header">
+
+      <div v-if="!authStore.isAuthenticated" class="auth-prompt">
+      <h2>Your Shopping Cart</h2>
+      <p>To view your cart and checkout, please:</p>
+      <div class="auth-buttons">
+        <router-link to="/login" class="auth-button">
+          Sign In
+        </router-link>
+        <span>or</span>
+        <router-link to="/register" class="auth-button">
+          Create an Account
+        </router-link>
+      </div>
+    </div>
+
+    <div v-else>
+      <div class="cart-header">
         <h1>Your Shopping Cart</h1>
         <p v-if="cartStore.cartItems.length > 0">
           Price
@@ -71,6 +87,7 @@
           </transition-group>
         </div>
 
+      
 
 
         <div class="summary-section">
@@ -89,6 +106,9 @@
           </div>
         </div>
       </div>
+    </div>
+
+    
   </div>
 </template>
 

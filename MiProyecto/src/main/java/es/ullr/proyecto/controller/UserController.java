@@ -1,6 +1,7 @@
 package es.ullr.proyecto.controller;
 
 import es.ullr.proyecto.model.User;
+import es.ullr.proyecto.repository.UserRepository;
 import es.ullr.proyecto.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,9 @@ public class UserController
 
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private UserRepository userRepository;
 
     /*// Crear un usuario
     @PostMapping
@@ -50,14 +54,24 @@ public class UserController
         return new ResponseEntity<>(listUsers, HttpStatus.OK);
     }
     
-    // Registrar un nuevo usuario
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@RequestBody User user) {
-        user.setRole("ADMIN"); // Asignar rol por defecto
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+        // Validar que el username no existe
+        if (userService.findByUsername(user.getUsername()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                   .body("Username already exists");
+        }
+
+        // Validar que el email no existe
+        if (userService.findByEmail(user.getEmail()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                   .body("Email already exists");
+        }
+
+        user.setRole("USER"); // Cambiar a USER por defecto
         User savedUser = userService.createUser(user);
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
-    
     @DeleteMapping("/{id}")
     public ResponseEntity<User> deleteUserbyId(@PathVariable long id){
     	

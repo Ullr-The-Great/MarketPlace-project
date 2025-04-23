@@ -30,4 +30,7 @@ public class Product {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+    
+    @Column(name = "image_url")
+    private String imageUrl = "placeholder.png";
 }

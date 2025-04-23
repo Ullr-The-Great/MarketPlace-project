@@ -40,17 +40,23 @@
   
   <style scoped>
   .logout-button {
-    padding: 0.5rem 1rem;
-    background-color: #ef4444;
-    color: white;
+    background-color: var(--navbar-bg);
+    color: rgb(0, 0, 0);
     border: none;
-    border-radius: 0.375rem;
+    border-radius: 3px;
     cursor: pointer;
     transition: background-color 0.2s;
+    min-width: 7vw;
+    min-height: 6vh;
+    font-weight: 550;
+    font-size: 15px;
+    font-family: Arial, Helvetica, sans-serif;
+    align-self: flex-start;
+    padding: 8px 16px;
   }
   
   .logout-button:hover {
-    background-color: #dc2626;
+    background-color: var(--navbar-bg-hover);
   }
   
   .logout-button:disabled {
