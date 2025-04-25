@@ -63,7 +63,7 @@ export const useProductStore = defineStore('product', {
           async fetchProductById(id: number) {
             this.loading = true;
             try {
-              const response = await api.get<Product>(`/products/${id}`); // Especifica el tipo
+              const response = await api.get<Product>(`/products/${id}`);
               this.currentProduct = response.data;
             } catch (error) {
               this.error = error instanceof Error ? error.message : 'Failed to fetch product';

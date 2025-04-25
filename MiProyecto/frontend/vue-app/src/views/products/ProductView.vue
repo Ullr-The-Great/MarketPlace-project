@@ -13,7 +13,7 @@
             <!-- Galería de imágenes -->
             <div class="product-gallery">
                 <div class="main-image">
-                    <img :src="mainImage || product.imageUrl || '@/assets/product-placeholder.png'" :alt="product.name">
+                    <img :src="product.imageUrl || '@/assets/product-placeholder.png'" :alt="product.name">
                 </div>
                 <div class="thumbnail-grid">
                     <div v-for="(image, index) in product.imageUrl" :key="index" class="thumbnail"
@@ -76,14 +76,15 @@ const route = useRoute();
 const cartStore = useCartStore();
 
 const product = ref<Product>({
-    id: 0,
-    name: '',
-    price: 0,
-    originalPrice: 0,
-    description: '',
-    imageUrl: '',
-    category: { id: 0, name: '' },
-    stock: 0,
+  id: 0,
+  name: '',
+  description: '',
+  price: 0,
+  category: { id: 0, name: '' },
+  stock: 0,
+  originalPrice: undefined,
+  imageUrl: undefined,
+  createdAt: undefined
 });
 
 const mainImage = ref<string>('');
@@ -117,7 +118,8 @@ const stockStatus = computed(() => {
 onMounted(async () => {
     try {
         const response = await api.get(`/products/${route.params.id}`);
-        product.value = response.data;
+        console.log(response.data);
+        product.value = response.data as Product;
         mainImage.value = product.value.imageUrl || '';
         loading.value = false;
     } catch (err) {
@@ -127,10 +129,10 @@ onMounted(async () => {
 });
 
 const addToCart = () => {
-    cartStore.addToCart({
-        product: product.value,
-        quantity: quantity.value
-    });
+    cartStore.addToCart(
+        product.value,
+        quantity.value
+    );
 };
 </script>
 

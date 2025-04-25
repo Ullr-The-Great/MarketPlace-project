@@ -1,7 +1,12 @@
 <template>
+   <router-link 
+    :to="`/products/${product.id}`" 
+    class="product-card"
+  >
     <div class="product-card">
       <div class="product-image-placeholder">
         {{ product.name.charAt(0) }}
+        
       </div>
       <div class="product-info">
         <h3>{{ product.name }}</h3>
@@ -18,6 +23,7 @@
         </button>
       </div>
     </div>
+  </router-link>
   </template>
 
   <script setup lang="ts">

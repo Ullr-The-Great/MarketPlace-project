@@ -50,6 +50,7 @@ public class SecurityConfig {
 						.requestMatchers("/api/users/register"
 										,"/api/auth/login"
 										,"/api/products"
+										,"/api/products/{id}"
 										,"/api/categories"
 										,"/api/auth/me"
 										,"/api/products/category/**"
