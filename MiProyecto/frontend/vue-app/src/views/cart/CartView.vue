@@ -1,11 +1,18 @@
 <template>
   <div class="cart-container">
+    
 
-    <div v-if="globalLoading" class="skeleton-loading">
-      <div class="skeleton-item" v-for="n in 3" :key="n">
-        <div class="skeleton-image"></div>
-        <div class="skeleton-text"></div>
-        <div class="skeleton-text short"></div>
+      <div v-if="!authStore.isAuthenticated" class="auth-prompt">
+      <h2>Your Shopping Cart</h2>
+      <p>To view your cart and checkout, please:</p>
+      <div class="auth-buttons">
+        <router-link to="/login" class="auth-button">
+          Sign In
+        </router-link>
+        <span>or</span>
+        <router-link to="/register" class="auth-button">
+          Create an Account
+        </router-link>
       </div>
     </div>
 
@@ -15,12 +22,13 @@
         <p v-if="cartStore.cartItems.length > 0">
           Price
         </p>
-
       </div>
 
-      <div v-if="cartStore.loading" class="loading-container">
 
-      </div>
+    <div v-if="cartStore.loading" class="loading-container">
+      <!-- Muestra varios skeletons durante la carga -->
+      <CartItemSkeleton v-for="n in skeletonCount" :key="'skeleton-'+n" />
+    </div>
 
       <div v-else-if="cartStore.error" class="error-message">
         <p>There was a problem loading your cart. Please try again.</p>
@@ -37,8 +45,8 @@
 
       <div v-else class="cart-content">
 
-
-        <TransitionGroup name="cart-item" tag="div" class="items-section">
+        <div class="items-section">
+          <transition-group name="fade">
           <div v-for="item in cartStore.cartItems" :key="item.id" class="cart-item">
             <div class="product-image-container">
               <img src="@/assets/product-placeholder.png" :alt="item.product.name" class="product-image">
@@ -76,7 +84,11 @@
               </div>
             </div>
           </div>
-        </TransitionGroup>
+          </transition-group>
+        </div>
+
+      
+
 
         <div class="summary-section">
           <div class="checkout-card">
@@ -96,6 +108,7 @@
       </div>
     </div>
 
+    
   </div>
 </template>
 
@@ -105,6 +118,7 @@ import { useCartStore } from '@/stores/cartStore';
 import { useAuthStore } from '@/stores/authStore';
 import { onMounted } from 'vue';
 import type { CartItem } from '@/types/cart';
+import CartItemSkeleton from '@/components/CartItemSkeleton.vue';
 
 
 const cartStore = useCartStore();
@@ -112,11 +126,10 @@ const authStore = useAuthStore();
 const isGift = ref(false);
 
 const globalLoading = ref(false);
+const skeletonCount = ref(3)
 
 onMounted(async () => {
-  if (authStore.user) {
-    await cartStore.fetchCart();
-  }
+ 
 });
 
 const refreshCart = async () => {

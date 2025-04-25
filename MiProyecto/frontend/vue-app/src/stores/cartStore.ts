@@ -110,30 +110,24 @@ export const useCartStore = defineStore('cart', {
       this.loading = false;
     }
   },
-    async updateQuantity(itemId: number, newQuantity: number) {
-      this.loading = true;
-      try {
-        const response = await api.put(
-          `/carts/items/${itemId}`,
-          { quantity: newQuantity }
-        );
-        
-        // Actualizar el estado local
-        if (this.currentCart?.items) {
-          const itemIndex = this.currentCart.items.findIndex(i => i.id === itemId);
-          if (itemIndex !== -1) {
-            this.currentCart.items[itemIndex].quantity = newQuantity;
-          }
-        }
-        
-        return response.data;
-      } catch (error) {
-        this.error = error instanceof Error ? error.message : 'Unknown error';
-        throw error;
-      } finally {
-        this.loading = false;
+  async updateQuantity (itemId: number, newQuantity: number) {
+    this.loading = true; // Activa el estado de carga
+    try {
+      const response = await api.put(`/carts/items/${itemId}`, { quantity: newQuantity });
+      // Actualización optimista del estado local
+      if (this.currentCart?.items) {
+        const item = this.currentCart.items.find(i => i.id === itemId);
+        if (item) item.quantity = newQuantity;
       }
-    },
+      return response.data;
+    } catch (error) {
+      // Revertir cambios si falla
+      this.error = error instanceof Error ? error.message : 'Failed to update quantity';
+      throw error;
+    } finally {
+      this.loading = false; // Desactiva el estado de carga
+    }
+  },
     async clearCart() {
       if (!this.currentCart) return;
       

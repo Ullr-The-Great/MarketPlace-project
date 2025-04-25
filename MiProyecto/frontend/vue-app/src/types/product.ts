@@ -4,9 +4,10 @@ export interface Product {
     id: number;
     name: string;
     price: number;
+    originalPrice?: number;
     description: string;
     imageUrl?: string;
     category: Category;
     stock: number;
-    createdAt: string;
+    createdAt?: string;
   }

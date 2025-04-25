@@ -24,6 +24,12 @@ const router = createRouter({
       component: ProductListView,
     },
     {
+      path: '/products/:id',
+      name: 'product',
+      component: () => import('../views/products/ProductView.vue'),
+      props: true
+    },
+    {
       path: '/cart',
       name: 'cart',
       component: CartView,
@@ -32,6 +38,12 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: LoginView,
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: () => import('@/views/auth/RegisterView.vue'),
+      meta: { requiresAuth: false }
     }
   ],
 });

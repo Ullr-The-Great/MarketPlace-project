@@ -9,6 +9,7 @@ export const useProductStore = defineStore('product', {
     state: () => ({
         product: [] as Product[],
         categories: [] as Category[],
+        currentProduct: null as Product | null,
         loading: false,
         error: null as string | null,
         filters: {
@@ -55,6 +56,17 @@ export const useProductStore = defineStore('product', {
               this.product = response.data;
             } catch (error) {
               this.error = error instanceof Error ? error.message : 'Unknown error';
+            } finally {
+              this.loading = false;
+            }
+          },
+          async fetchProductById(id: number) {
+            this.loading = true;
+            try {
+              const response = await api.get<Product>(`/products/${id}`);
+              this.currentProduct = response.data;
+            } catch (error) {
+              this.error = error instanceof Error ? error.message : 'Failed to fetch product';
             } finally {
               this.loading = false;
             }
