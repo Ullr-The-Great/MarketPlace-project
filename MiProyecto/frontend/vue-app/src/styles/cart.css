@@ -95,6 +95,14 @@
   margin-top: 10px;
 }
 
+.quantity-adjuster{
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 1vw;
+  width: 100%;
+}
+
 .quantity-button {
   width: 30px;
   height: 30px;
@@ -121,7 +129,9 @@
 .quantity-display {
   min-width: 30px;
   text-align: center;
-  font-weight: bold;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  padding: 0.7vh 2vw;
 }
 
 .action-links {

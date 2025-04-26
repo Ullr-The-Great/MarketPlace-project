@@ -13,6 +13,7 @@
     --border-color:rgb(17, 17, 17,0.3);
     --border-color-hover:rgb(17, 17, 17,0.9);
     --card-bg: white;
+    --success-color: rgb(43, 146, 77);
   }
   
   @media (prefers-color-scheme: dark) {
