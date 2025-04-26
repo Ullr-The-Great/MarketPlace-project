@@ -53,6 +53,8 @@ const handleCartClick = () => {
   top: 0;
   z-index: 1000;
   height: 100px;
+  display: flex;
+  width:100%;
 }
 
 .navbar-container {
@@ -60,6 +62,7 @@ const handleCartClick = () => {
   justify-content: space-between;
   align-items: center;
   margin: 0 5vw;
+  flex-grow: 1;
 }
 
 .navbar-links {

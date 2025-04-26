@@ -1,8 +1,11 @@
 package es.ullr.proyecto.controller;
 
+import es.ullr.proyecto.dto.ProductDto;
 import es.ullr.proyecto.dto.ProductWithImagesDTO;
+import es.ullr.proyecto.model.Category;
 import es.ullr.proyecto.model.Product;
 import es.ullr.proyecto.model.ProductImage;
+import es.ullr.proyecto.service.CategoryService;
 import es.ullr.proyecto.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +23,9 @@ public class ProductController
 
     @Autowired
     private ProductService productService;
+    
+    @Autowired
+    private CategoryService categoryService;
 
     // Crear un producto
    /* @PostMapping
@@ -31,18 +37,19 @@ public class ProductController
 */
     // Obtener todos los productos
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() 
-    {
-        List<Product> products = productService.findAllProducts();
-        return new ResponseEntity<>(products, HttpStatus.OK);
+    public ResponseEntity<List<ProductDto>> getAllProducts() {
+        List<ProductDto> products = productService.findAllProducts().stream()
+            .map(ProductDto::new) // Convertir cada producto a un DTO
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(products);
     }
     
     // Obtener un producto por ID
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) 
-    {
-        Optional<Product> product = productService.findProductById(id);
-        return product.map(ResponseEntity::ok).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<ProductDto> getProductById(@PathVariable Long id) {
+        Product product = productService.findProductById(id)
+            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        return ResponseEntity.ok(new ProductDto(product));
     }
 
     // Obtener productos por categoría
@@ -63,35 +70,46 @@ public class ProductController
     
     //Imagenes productos
     
-    @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody ProductWithImagesDTO productDTO) {
-        Product product = new Product();
-        // Mapear campos básicos
-        product.setName(productDTO.getName());
-        product.setDescription(productDTO.getDescription());
-        product.setPrice(productDTO.getPrice());
-        product.setStock(productDTO.getStock());
-        
-        // Crear producto con imágenes
-        Product savedProduct = productService.createProductWithImages(
-            product, 
-            productDTO.getImageUrls()
-        );
-        
-        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
-    }
+	    @PostMapping
+	    public ResponseEntity<Product> createProduct(@RequestBody ProductWithImagesDTO productDTO) {
+	    	Product product = new Product();
+	        product.setName(productDTO.getName());
+	        product.setDescription(productDTO.getDescription());
+	        product.setPrice(productDTO.getPrice());
+	        product.setStock(productDTO.getStock());
 
-    @GetMapping("/{id}/images")
-    public ResponseEntity<List<String>> getProductImages(@PathVariable Long id) {
-        Product product = productService.findProductById(id)
-            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-        
-        List<String> imageUrls = product.getImages().stream()
-            .map(ProductImage::getImageUrl)
-            .collect(Collectors.toList());
-        
-        return ResponseEntity.ok(imageUrls);
-    }
+	        // Asignar la categoría
+	        Category category = categoryService.findCategoryById(productDTO.getCategoryId())
+	            .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+	        product.setCategory(category);
+
+	        // Crear producto con imágenes
+	        Product savedProduct = productService.createProductWithImages(product, productDTO.getImageUrls());
+	        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
+	    }
+
+	    @PostMapping("/{id}/images")
+	    public ResponseEntity<Product> addImageToProduct(@PathVariable Long id, @RequestBody String imageUrl) {
+	        // Limpiar caracteres adicionales como comillas y barras invertidas
+	        String cleanedImageUrl = imageUrl.trim()
+	                                         .replaceAll("^\"|\"$", "") // Elimina comillas al inicio y al final
+	                                         .replace("\\", "");       // Elimina barras invertidas
+
+	        Product updatedProduct = productService.addImageToProduct(id, cleanedImageUrl);
+	        return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
+	    }
+	    
+	    @GetMapping("/{id}/images")
+	    public ResponseEntity<List<String>> getProductImages(@PathVariable Long id) {
+	        Product product = productService.findProductById(id)
+	            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+	        List<String> imageUrls = product.getImages().stream()
+	            .map(ProductImage::getImageUrl)
+	            .collect(Collectors.toList());
+
+	        return ResponseEntity.ok(imageUrls);
+	    }
     
     
 }

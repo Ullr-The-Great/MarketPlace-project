@@ -32,7 +32,8 @@ export const useProductStore = defineStore('product', {
                 product.name.toLowerCase().includes(state.filters.searchQuery.toLowerCase())
               );
             }
-            
+            console.log('Filtered products:', filtered);
+
             return filtered;
           
         }
@@ -42,6 +43,8 @@ export const useProductStore = defineStore('product', {
             this.loading = true;
             try{
                 const response = await api.get('/products');
+                console.log('Fetched products:', response.data);
+
                 this.product = response.data;
             }catch (error) {
                 this.error = error instanceof Error ? error.message : 'unknown error';

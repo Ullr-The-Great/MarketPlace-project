@@ -1,5 +1,7 @@
 package es.ullr.proyecto.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import es.ullr.proyecto.dto.CategoryDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -21,6 +23,7 @@ public class ProductImage {
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
+    @JsonBackReference
     private Product product;
     
     

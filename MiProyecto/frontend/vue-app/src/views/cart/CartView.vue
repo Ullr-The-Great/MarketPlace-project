@@ -1,34 +1,25 @@
 <template>
   <div class="cart-container">
-    
 
-      <div v-if="!authStore.isAuthenticated" class="auth-prompt">
+
+    <div v-if="!authStore.isAuthenticated" class="auth-prompt">
       <h2>Your Shopping Cart</h2>
       <p>To view your cart and checkout, please:</p>
       <div class="auth-buttons">
-        <router-link to="/login" class="auth-button">
-          Sign In
-        </router-link>
+        <router-link to="/login" class="auth-button primary">Sign In</router-link>
         <span>or</span>
-        <router-link to="/register" class="auth-button">
-          Create an Account
-        </router-link>
+        <router-link to="/register" class="auth-button secondary">Create an Account</router-link>
       </div>
     </div>
 
     <div v-else>
-      <div class="cart-header">
-        <h1>Your Shopping Cart</h1>
-        <p v-if="cartStore.cartItems.length > 0">
-          Price
-        </p>
+      
+
+
+      <div v-if="cartStore.loading" class="loading-container">
+        <!-- Muestra varios skeletons durante la carga -->
+        <CartItemSkeleton v-for="n in skeletonCount" :key="'skeleton-' + n" />
       </div>
-
-
-    <div v-if="cartStore.loading" class="loading-container">
-      <!-- Muestra varios skeletons durante la carga -->
-      <CartItemSkeleton v-for="n in skeletonCount" :key="'skeleton-'+n" />
-    </div>
 
       <div v-else-if="cartStore.error" class="error-message">
         <p>There was a problem loading your cart. Please try again.</p>
@@ -45,50 +36,45 @@
 
       <div v-else class="cart-content">
 
+        <div class="cart-header">
+        <h1>Your Shopping Cart</h1>
+      </div>
+      <div class="cart-subheader">
         <div class="items-section">
           <transition-group name="fade">
-          <div v-for="item in cartStore.cartItems" :key="item.id" class="cart-item">
-            <div class="product-image-container">
-              <img src="@/assets/product-placeholder.png" :alt="item.product.name" class="product-image">
-            </div>
+            <div v-for="item in cartStore.cartItems" :key="item.id" class="cart-item">
+              {{ console.log('Cart item:', item) }}
+              <div class="product-image-container">
+                <img :src="getMainImage(item.product)" :alt="item.product.name" class="product-image">
+              </div>
 
-            <div class="product-details">
-              <div class="product-info">
-                <h3 class="product-title">{{ item.product.name }}</h3>
+              <div class="product-details">
+                <div class="product-header">
+                  <h3 class="product-title">{{ item.product.name }}</h3>
+                  <div class="product-price">
+                    <span class="price-amount">{{ (item.product.price * item.quantity).toFixed(2) }} €</span>
+                    <span class="price-each">{{ item.product.price.toFixed(2) }} € each</span>
+                  </div>
+                </div>
+
                 <p class="product-stock">In Stock</p>
 
                 <div class="quantity-controls">
-
-                  <div class="quantity-controls">
-                    <div class="quantity-adjuster">
-                      <button @click="decreaseQuantity(item)" class="quantity-button" :disabled="item.quantity <= 1">
-                        -
-                      </button>
-                      <span class="quantity-display">{{ item.quantity }}</span>
-                      <button @click="increaseQuantity(item)" class="quantity-button">
-                        +
-                      </button>
-                    </div>
-                  </div>
-
-                  <div class="action-links">
-                    <button @click="removeItem(item.id)" class="action-link">Delete</button>
+                  <div class="quantity-adjuster">
+                    <button @click="decreaseQuantity(item)" class="quantity-button"
+                      :disabled="item.quantity <= 1">-</button>
+                    <span class="quantity-display">{{ item.quantity }}</span>
+                    <button @click="increaseQuantity(item)" class="quantity-button">+</button>
                   </div>
                 </div>
-              </div>
 
-              <div class="product-price">
-                <span class="price-amount">{{ (item.product.price * item.quantity).toFixed(2) }} € {{
-                  console.log(item.product.price) }}</span>
-                <span class="price-each">{{ item.product.price.toFixed(2) }} € each</span>
+                <div class="action-links">
+                  <button @click="removeItem(item.id)" class="action-link">Delete</button>
+                </div>
               </div>
             </div>
-          </div>
           </transition-group>
         </div>
-
-      
-
 
         <div class="summary-section">
           <div class="checkout-card">
@@ -106,9 +92,11 @@
           </div>
         </div>
       </div>
+       
+      </div>
     </div>
 
-    
+
   </div>
 </template>
 
@@ -119,6 +107,9 @@ import { useAuthStore } from '@/stores/authStore';
 import { onMounted } from 'vue';
 import type { CartItem } from '@/types/cart';
 import CartItemSkeleton from '@/components/CartItemSkeleton.vue';
+import { Product } from '@/types/product';
+import placeholderImage from '@/assets/product-placeholder.png';
+
 
 
 const cartStore = useCartStore();
@@ -128,8 +119,27 @@ const isGift = ref(false);
 const globalLoading = ref(false);
 const skeletonCount = ref(3)
 
+const getMainImage = (product: Product): string => {
+  console.log('product:', product);
+
+  // Verifica si el campo `images` existe y mapea las URLs
+  const imageUrls = (product as any).images?.map((image: { imageUrl: string }) => image.imageUrl) || product.imageUrls || [];
+
+  if (imageUrls.length === 0) {
+    console.warn('No images found for product:', product);
+    return placeholderImage;
+  }
+
+  return imageUrls[0]; // Devuelve la primera URL
+};
+
+const props = defineProps<{
+  product: Product;
+}>();
+
+
 onMounted(async () => {
- 
+
 });
 
 const refreshCart = async () => {

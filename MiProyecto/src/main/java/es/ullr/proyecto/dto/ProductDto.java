@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import es.ullr.proyecto.model.Product;
+import es.ullr.proyecto.model.ProductImage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,7 +34,7 @@ public class ProductDto {
 	        // Mapear las imágenes si existen
 	        if (product.getImages() != null) {
 	            this.imageUrls = product.getImages().stream()
-	                .map(image -> image.getImageUrl())
+	                .map(ProductImage::getImageUrl)
 	                .collect(Collectors.toList());
 	        }
 	    }

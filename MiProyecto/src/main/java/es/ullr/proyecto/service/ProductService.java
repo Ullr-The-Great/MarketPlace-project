@@ -5,6 +5,8 @@ import es.ullr.proyecto.model.ProductImage;
 import es.ullr.proyecto.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,24 +39,31 @@ public class ProductService
     }
     
     public Product createProductWithImages(Product product, List<String> imageUrls) {
+        // Guardar el producto
         Product savedProduct = productRepository.save(product);
-        
-        List<ProductImage> images = imageUrls.stream()
-            .map(url -> new ProductImage(url, savedProduct))
-            .collect(Collectors.toList());
-            
-        savedProduct.setImages(images);
+
+        // Asegúrate de modificar la colección existente
+        if (savedProduct.getImages() == null) {
+            savedProduct.setImages(new ArrayList<>());
+        }
+
+        // Asociar imágenes al producto
+        for (String url : imageUrls) {
+            ProductImage image = new ProductImage(url, savedProduct);
+            savedProduct.getImages().add(image);
+        }
+
         return productRepository.save(savedProduct);
     }
 
     public Product addImageToProduct(Long productId, String imageUrl) {
         Product product = productRepository.findById(productId)
             .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-        
+
         ProductImage newImage = new ProductImage();
         newImage.setImageUrl(imageUrl);
         newImage.setProduct(product);
-        
+
         product.getImages().add(newImage);
         return productRepository.save(product);
     }
