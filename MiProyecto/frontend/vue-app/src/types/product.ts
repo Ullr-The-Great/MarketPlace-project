@@ -6,7 +6,7 @@ export interface Product {
     price: number;
     originalPrice?: number;
     description: string;
-    imageUrl?: string;
+    imageUrls?: string[]; // Cambiar de `imageUrl` a `imageUrls` para manejar múltiples imágenes
     category: Category;
     stock: number;
     createdAt?: string;

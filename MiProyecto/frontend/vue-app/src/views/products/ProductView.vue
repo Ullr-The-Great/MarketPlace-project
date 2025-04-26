@@ -13,10 +13,10 @@
             <!-- Galería de imágenes -->
             <div class="product-gallery">
                 <div class="main-image">
-                    <img :src="product.imageUrl || '@/assets/product-placeholder.png'" :alt="product.name">
+                    <img :src="mainImage || '@/assets/product-placeholder.png'" :alt="product.name">
                 </div>
                 <div class="thumbnail-grid">
-                    <div v-for="(image, index) in product.imageUrl" :key="index" class="thumbnail"
+                    <div v-for="(image, index) in product.imageUrls" :key="index" class="thumbnail"
                         :class="{ active: mainImage === image }" @click="mainImage = image">
                         <img :src="image" :alt="`Thumbnail ${index + 1}`">
                     </div>
@@ -83,7 +83,7 @@ const product = ref<Product>({
   category: { id: 0, name: '' },
   stock: 0,
   originalPrice: undefined,
-  imageUrl: undefined,
+  imageUrls: [], // Cambiar a `imageUrls` para manejar múltiples imágenes
   createdAt: undefined
 });
 
@@ -118,9 +118,8 @@ const stockStatus = computed(() => {
 onMounted(async () => {
     try {
         const response = await api.get(`/products/${route.params.id}`);
-        console.log(response.data);
         product.value = response.data as Product;
-        mainImage.value = product.value.imageUrl || '';
+        mainImage.value = product.value.imageUrls?.[0] || ''; // Usar la primera imagen como principal
         loading.value = false;
     } catch (err) {
         error.value = 'Failed to load product details';

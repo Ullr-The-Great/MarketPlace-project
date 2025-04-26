@@ -26,11 +26,10 @@
           No products found
         </div>
         <div v-else class="products-grid">
-          <ProductCard 
-            v-for="product in productStore.filteredProducts" 
-            :key="product.id" 
-            :product="product" 
-          />
+          <div v-for="product in productStore.filteredProducts" :key="product.id">
+      {{ console.log('Product in parent:', product) }}
+      <ProductCard :product="product" />
+    </div>
         </div>
       </div>
     </div>
