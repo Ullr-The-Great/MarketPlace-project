@@ -62,6 +62,7 @@
                 </div>
             </div>
         </div>
+        <ProductReviews :productId="product.id" />
     </div>
 </template>
 
@@ -71,6 +72,8 @@ import { useRoute } from 'vue-router';
 import { useCartStore } from '@/stores/cartStore';
 import api from '@/services/api';
 import { Product } from '@/types/product';
+import ProductReviews from '@/components/reviews/ProductReviews.vue';
+
 
 const route = useRoute();
 const cartStore = useCartStore();
@@ -133,7 +136,7 @@ const addToCart = () => {
         quantity.value
     );
 };
-</script>
+</script>   
 
 <style scoped>
 .product-view {

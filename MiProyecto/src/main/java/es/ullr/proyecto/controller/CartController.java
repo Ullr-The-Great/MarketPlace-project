@@ -155,12 +155,19 @@ public class CartController
     // Vaciar carrito
     @DeleteMapping
     public ResponseEntity<Void> clearCart(Authentication authentication) {
+        // Obtener el usuario autenticado
         User user = userService.findByUsername(authentication.getName())
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-            
-        cartService.clearCart(user);
+
+        // Obtener el carrito del usuario
+        Cart cart = cartService.getOrCreateCart(user);
+
+        // Eliminar todos los ítems del carrito
+        cartService.clearCartItems(cart);
+
         return ResponseEntity.noContent().build();
     }
+    
     @PutMapping("/items/{itemId}")
     public ResponseEntity<CartItemDto> updateCartItemQuantity(
             @PathVariable Long itemId,

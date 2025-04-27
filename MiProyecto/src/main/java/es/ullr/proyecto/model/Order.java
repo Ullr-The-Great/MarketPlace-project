@@ -28,4 +28,7 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
+    
+    @Column(name = "payment_intent_id", nullable = false)
+    private String paymentIntentId;
 }

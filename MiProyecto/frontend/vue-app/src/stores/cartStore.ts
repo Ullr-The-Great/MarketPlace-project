@@ -128,21 +128,21 @@ export const useCartStore = defineStore('cart', {
       this.loading = false; // Desactiva el estado de carga
     }
   },
-    async clearCart() {
-      if (!this.currentCart) return;
-      
-      this.loading = true;
-      try {
-        console.log("Hola desde antes de borrar")
-        await api.delete(`/carts/${this.currentCart.id}/items`);
-        this.currentCart.items = [];
-      } catch (error) {
-        this.error = error instanceof Error ? error.message : 'Unknown error';
-        throw error;
-      } finally {
-        this.loading = false;
-      }
-    },
+  async clearCart() {
+    if (!this.currentCart) return;
+  
+    this.loading = true;
+    try {
+      console.log("Intentando vaciar el carrito...");
+      await api.delete(`/carts`); // Llama al endpoint correcto en el backend
+      this.currentCart.items = []; // Limpia los ítems localmente
+    } catch (error) {
+      this.error = error instanceof Error ? error.message : 'Unknown error';
+      throw error;
+    } finally {
+      this.loading = false;
+    }
+  },
     async initializeCart(userId: number) {
       try {
         // Primero intentamos obtener el carrito existente

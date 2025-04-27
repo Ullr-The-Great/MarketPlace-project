@@ -109,11 +109,15 @@ import type { CartItem } from '@/types/cart';
 import CartItemSkeleton from '@/components/CartItemSkeleton.vue';
 import { Product } from '@/types/product';
 import placeholderImage from '@/assets/product-placeholder.png';
+import { useRouter } from 'vue-router';
+
 
 
 
 const cartStore = useCartStore();
 const authStore = useAuthStore();
+const router = useRouter();
+
 const isGift = ref(false);
 
 const globalLoading = ref(false);
@@ -190,7 +194,7 @@ const removeItem = async (itemId: number) => {
 };
 
 const proceedToCheckout = () => {
-  // Implement checkout navigation
+  router.push('/checkout'); // Navegar a la página de checkout
 };
 
 </script>
