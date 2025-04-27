@@ -1,20 +1,24 @@
 <template>
   <div class="product-card">
-    <div class="product-image-placeholder">
+    <div class="product-image-container">
       <router-link :to="`/products/${product.id}`">
-        <img :src="mainImage" :alt="product.name">
+        <img :src="mainImage" :alt="product.name" class="product-image">
       </router-link>
     </div>
     <div class="product-info">
-      <h3>{{ product.name }}</h3>
-      <span class="price">${{ product.price.toFixed(2) }}</span>
-      <div class="category">{{ product.category.name }}</div>
-      <div class="stock" :class="{ 'low-stock': product.stock < 5 }">
+      <h3 class="product-name">{{ product.name }}</h3>
+      <div class="product-category">{{ product.category.name }}</div>
+      <div class="product-pricing">
+        <span class="product-price">${{ product.price.toFixed(2) }}</span>
+        <span v-if="product.originalPrice" class="product-original-price">${{ product.originalPrice.toFixed(2) }}</span>
+      </div>
+      <div class="product-stock" :class="{ 'low-stock': product.stock < 5 }">
         Stock: {{ product.stock }}
       </div>
       <button 
+        class="add-to-cart-button"
         @click="handleAddToCart"
-        :disabled="addingToCart"
+        :disabled="addingToCart || product.stock <= 0"
       >
         {{ product.stock > 0 ? 'Add to cart' : 'Out of stock' }}
       </button>

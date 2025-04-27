@@ -44,6 +44,11 @@ const router = createRouter({
       name: 'register',
       component: () => import('@/views/auth/RegisterView.vue'),
       meta: { requiresAuth: false }
+    },
+    {
+      path: '/checkout',
+      name: 'checkout',
+      component: () => import('@/views/CheckoutView.vue'),
     }
   ],
 });

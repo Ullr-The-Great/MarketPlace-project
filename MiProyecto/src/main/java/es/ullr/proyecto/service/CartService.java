@@ -7,6 +7,8 @@ import es.ullr.proyecto.model.User;
 import es.ullr.proyecto.repository.CartItemRepository;
 import es.ullr.proyecto.repository.CartRepository;
 import es.ullr.proyecto.repository.ProductRepository;
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -98,20 +100,9 @@ public class CartService {
         return cartItemRepository.findByCart(cart);
     }
     
-    public void clearCart(User user) {
-        
-    	Cart cart = getOrCreateCart(user);
-    	cartItemRepository.deleteByCart(cart);;
-    	/*Optional<Cart> cartOptional = cartRepository.findByUser(user);
-        
-        if(cartOptional.isPresent()) {
-        	Cart cart = cartOptional.get();
-        	
-        	List<CartItem> cartItems = cart.getCartItems();
-        	
-        	cartItemRepository.deleteAll(cartItems);
-        	
-        }*/
+    @Transactional
+    public void clearCartItems(Cart cart) {
+        cartItemRepository.deleteByCart(cart); // Elimina todos los ítems asociados al carrito
     }
     
     public CartItem updateCartItemQuantity(Long cartItemId, int newQuantity) {

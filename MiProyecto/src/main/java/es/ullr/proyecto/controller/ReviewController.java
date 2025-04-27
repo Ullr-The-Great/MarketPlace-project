@@ -9,6 +9,7 @@ import es.ullr.proyecto.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,10 +30,21 @@ public class ReviewController
 
     // Crear una reseña
     @PostMapping
-    public ResponseEntity<Review> createReview(@RequestParam Long productId, @RequestParam Long userId, @RequestParam int rating, @RequestParam String commentario) 
-    {
-        Product product = productService.findProductById(productId).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-        User user = userService.findByUsername(userId.toString()).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    public ResponseEntity<Review> createReview(
+        @RequestParam Long productId,
+        @RequestParam int rating,
+        @RequestParam String commentario,
+        Authentication authentication
+    ) {
+        // Obtener el usuario autenticado
+        User user = userService.findByUsername(authentication.getName())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Obtener el producto
+        Product product = productService.findProductById(productId)
+            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        // Crear la reseña
         Review review = reviewService.createReview(product, user, rating, commentario);
         return new ResponseEntity<>(review, HttpStatus.CREATED);
     }
