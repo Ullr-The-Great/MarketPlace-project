@@ -1,103 +1,112 @@
-import { defineStore } from 'pinia';
-import api from '@/services/api';
-import type { Product } from '@/types/product.ts';
-import type { Category } from '@/types/category.ts';
-import { useAuthStore } from './authStore';
-
+import { defineStore } from 'pinia'
+import api from '@/services/api'
+import type { Product } from '@/types/product.ts'
+import type { Category } from '@/types/category.ts'
+import { useAuthStore } from './authStore'
 
 export const useProductStore = defineStore('product', {
-    state: () => ({
-        product: [] as Product[],
-        categories: [] as Category[],
-        currentProduct: null as Product | null,
-        loading: false,
-        error: null as string | null,
-        filters: {
-            categoryId: null as number | null,
-            searchQuery: ""
-        }
-    }),
-    getters: {
-        filteredProducts(state){
-            let filtered = [...state.product];
-      
-            if (state.filters.categoryId) {
-              filtered = filtered.filter(
-                product => product.category.id === state.filters.categoryId
-              );
-            }
-            
-            if (state.filters.searchQuery) {
-              filtered = filtered.filter(product =>
-                product.name.toLowerCase().includes(state.filters.searchQuery.toLowerCase())
-              );
-            }
-            console.log('Filtered products:', filtered);
-
-            return filtered;
-          
-        }
+  state: () => ({
+    products: [] as Product[], // Asegúrate de que sea un array vacío
+    categories: [] as Category[],
+    currentProduct: null as Product | null,
+    loading: false,
+    error: null as string | null,
+    filters: {
+      categoryId: null as number | null,
+      searchQuery: '',
     },
-    actions: {
-        async fetchProducts(){
-            this.loading = true;
-            try{
-                const response = await api.get('/products');
-                console.log('Fetched products:', response.data);
+  }),
+  getters: {
+    filteredProducts(state) {
+      let filtered = [...state.product]
 
-                this.product = response.data;
-            }catch (error) {
-                this.error = error instanceof Error ? error.message : 'unknown error';
-            }finally {
-                this.loading = false;
-            }
-        },
-        async fetchProductsByCategory(categoryId: number) {
-            this.loading = true;
-            try {
-              const response = await api.get(`/products/category/${categoryId}`);
-              this.product = response.data;
-            } catch (error) {
-              this.error = error instanceof Error ? error.message : 'Unknown error';
-            } finally {
-              this.loading = false;
-            }
-          },
-          async fetchProductById(id: number) {
-            this.loading = true;
-            try {
-              const response = await api.get<Product>(`/products/${id}`);
-              this.currentProduct = response.data;
-            } catch (error) {
-              this.error = error instanceof Error ? error.message : 'Failed to fetch product';
-            } finally {
-              this.loading = false;
-            }
-          },
-          async fetchCategories() {
-            try {
-              // Asumiendo que tienes un endpoint /categories
-              const response = await api.get('/categories');
-              this.categories = response.data;
-            } catch (error) {
-              console.error('Error fetching categories:', error);
-            }
-          },
-          async searchProducts(query: string) {
-            this.loading = true;
-            try {
-              const response = await api.get(`/products/search?name=${query}`);
-              this.product = response.data;
-            } catch (error) {
-              this.error = error instanceof Error ? error.message : 'Unknown error';
-            } finally {
-              this.loading = false;
-            }
-          },
-          updateFilters(newFilters: Partial<typeof this.filters>) {
-            this.filters = { ...this.filters, ...newFilters };
-          }
-        }
+      if (state.filters.categoryId) {
+        filtered = filtered.filter((product) => product.category.id === state.filters.categoryId)
+      }
 
+      if (state.filters.searchQuery) {
+        filtered = filtered.filter((product) =>
+          product.name.toLowerCase().includes(state.filters.searchQuery.toLowerCase()),
+        )
+      }
+      console.log('Filtered products:', filtered)
+
+      return filtered
+    },
+  },
+  actions: {
+    async fetchProducts() {
+      this.loading = true
+      try {
+        const response = await api.get('/products')
+        console.log('Fetched products:', response.data)
+
+        this.product = response.data
+      } catch (error) {
+        this.error = error instanceof Error ? error.message : 'unknown error'
+      } finally {
+        this.loading = false
+      }
+    },
+    async fetchProductsByCategory(categoryId: number) {
+      this.loading = true
+      try {
+        const response = await api.get(`/products/category/${categoryId}`)
+        this.product = response.data
+      } catch (error) {
+        this.error = error instanceof Error ? error.message : 'Unknown error'
+      } finally {
+        this.loading = false
+      }
+    },
+    async fetchProductById(id: number) {
+      this.loading = true
+      try {
+        const response = await api.get<Product>(`/products/${id}`)
+        this.currentProduct = response.data
+      } catch (error) {
+        this.error = error instanceof Error ? error.message : 'Failed to fetch product'
+      } finally {
+        this.loading = false
+      }
+    },
+    async fetchCategories() {
+      try {
+        // Asumiendo que tienes un endpoint /categories
+        const response = await api.get('/categories')
+        this.categories = response.data
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+      }
+    },
+    async searchProducts(query: string) {
+      this.loading = true
+      try {
+        const response = await api.get(`/products/search?name=${query}`)
+        this.product = response.data
+      } catch (error) {
+        this.error = error instanceof Error ? error.message : 'Unknown error'
+      } finally {
+        this.loading = false
+      }
+    },
+    updateFilters(newFilters: Partial<typeof this.filters>) {
+      this.filters = { ...this.filters, ...newFilters }
+    },
+    async fetchPaginatedProducts(page = 0, size = 3) {
+      this.loading = true;
+      try {
+        const response = await api.get(`/products/paginated`, {
+          params: { page, size },
+        });
+        this.products = response.data.content; // Productos de la página actual
+        this.totalPages = response.data.totalPages; // Total de páginas
+        this.currentPage = response.data.number; // Página actual
+      } catch (error) {
+        this.error = error instanceof Error ? error.message : 'Failed to fetch products';
+      } finally {
+        this.loading = false;
+      }
+    }
+  },
 })
-

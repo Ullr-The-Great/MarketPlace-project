@@ -8,6 +8,7 @@ import es.ullr.proyecto.model.ProductImage;
 import es.ullr.proyecto.service.CategoryService;
 import es.ullr.proyecto.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -111,5 +112,14 @@ public class ProductController
 	        return ResponseEntity.ok(imageUrls);
 	    }
     
+	    @GetMapping("/paginated")
+	    public ResponseEntity<Page<ProductDto>> getPaginatedProducts(
+	        @RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "3") int size
+	    ) {
+	        Page<Product> productPage = productService.findPaginatedProducts(page, size);
+	        Page<ProductDto> productDtoPage = productPage.map(ProductDto::new); // Convertir a DTO
+	        return ResponseEntity.ok(productDtoPage);
+	    }
     
 }
