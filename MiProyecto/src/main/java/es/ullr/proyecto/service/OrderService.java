@@ -59,4 +59,10 @@ public class OrderService
     {
         return orderRepository.findByUser(user);
     }
+    
+    public boolean hasUserPurchasedProduct(User user, Product product) {
+        // Verificar si existe un OrderItem asociado al producto y al usuario
+        return orderItemRepository.existsByOrderUserAndProduct(user, product);
+    }
+    
 }

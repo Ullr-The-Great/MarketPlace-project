@@ -3,6 +3,7 @@ package es.ullr.proyecto.controller;
 import es.ullr.proyecto.model.Product;
 import es.ullr.proyecto.model.Review;
 import es.ullr.proyecto.model.User;
+import es.ullr.proyecto.service.OrderService;
 import es.ullr.proyecto.service.ProductService;
 import es.ullr.proyecto.service.ReviewService;
 import es.ullr.proyecto.service.UserService;
@@ -28,6 +29,9 @@ public class ReviewController
 
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private OrderService orderService;
 
     // Crear una reseña
     @PostMapping
@@ -37,30 +41,32 @@ public class ReviewController
         @RequestParam String commentario,
         Authentication authentication
     ) {
-        // Obtener el usuario autenticado
         User user = userService.findByUsername(authentication.getName())
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Obtener el producto
         Product product = productService.findProductById(productId)
             .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
-        // Verificar si ya existe una reseña del usuario para este producto
+        // Verificar si el usuario ha comprado el producto
+        boolean hasPurchased = orderService.hasUserPurchasedProduct(user, product);
+        if (!hasPurchased) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(null); // O puedes devolver un mensaje de error personalizado
+        }
+
         Optional<Review> existingReview = reviewService.findReviewByProductAndUser(product, user);
 
         if (existingReview.isPresent()) {
-            // Actualizar la reseña existente
             Review review = existingReview.get();
             review.setRating(rating);
             review.setCommentario(commentario);
             return new ResponseEntity<>(reviewService.saveReview(review), HttpStatus.OK);
         }
 
-        // Crear una nueva reseña
         Review newReview = reviewService.createReview(product, user, rating, commentario);
         return new ResponseEntity<>(newReview, HttpStatus.CREATED);
     }
-
+    
     // Obtener reseñas de un producto
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<Review>> getReviewsByProduct(@PathVariable Long productId) 

@@ -87,6 +87,10 @@ const handlePayment = async () => {
     // Crear PaymentIntent en el backend
     const { data } = await api.post('/payments/create-payment-intent', {
       amount: Math.round(cartStore.totalPrice * 100), // Convertir a centavos
+      items: cartStore.cartItems.map(item => ({
+        productId: item.product.id,
+        quantity: item.quantity
+      }))
     });
 
     const clientSecret = data.clientSecret;
@@ -108,6 +112,7 @@ const handlePayment = async () => {
       await cartStore.clearCart();
     }
   } catch (err: any) {
+    console.error("Error procesando el pago:", err.message);
     error.value = err.message || "Error procesando el pago";
   } finally {
     loading.value = false;
