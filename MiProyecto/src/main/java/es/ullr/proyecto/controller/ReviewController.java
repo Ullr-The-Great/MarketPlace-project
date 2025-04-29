@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -30,7 +31,7 @@ public class ReviewController
 
     // Crear una reseña
     @PostMapping
-    public ResponseEntity<Review> createReview(
+    public ResponseEntity<Review> createOrUpdateReview(
         @RequestParam Long productId,
         @RequestParam int rating,
         @RequestParam String commentario,
@@ -44,9 +45,20 @@ public class ReviewController
         Product product = productService.findProductById(productId)
             .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
-        // Crear la reseña
-        Review review = reviewService.createReview(product, user, rating, commentario);
-        return new ResponseEntity<>(review, HttpStatus.CREATED);
+        // Verificar si ya existe una reseña del usuario para este producto
+        Optional<Review> existingReview = reviewService.findReviewByProductAndUser(product, user);
+
+        if (existingReview.isPresent()) {
+            // Actualizar la reseña existente
+            Review review = existingReview.get();
+            review.setRating(rating);
+            review.setCommentario(commentario);
+            return new ResponseEntity<>(reviewService.saveReview(review), HttpStatus.OK);
+        }
+
+        // Crear una nueva reseña
+        Review newReview = reviewService.createReview(product, user, rating, commentario);
+        return new ResponseEntity<>(newReview, HttpStatus.CREATED);
     }
 
     // Obtener reseñas de un producto
@@ -57,4 +69,22 @@ public class ReviewController
         List<Review> reviews = reviewService.findReviewsByProduct(product);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
+    
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId, Authentication authentication) {
+        User user = userService.findByUsername(authentication.getName())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Review review = reviewService.findById(reviewId)
+            .orElseThrow(() -> new RuntimeException("Reseña no encontrada"));
+
+        // Verificar que la reseña pertenece al usuario autenticado
+        if (review.getUser().getId() !=(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        reviewService.deleteReview(reviewId);
+        return ResponseEntity.noContent().build();
+    }
+    
 }
