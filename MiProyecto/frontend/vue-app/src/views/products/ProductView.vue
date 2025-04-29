@@ -62,7 +62,8 @@
                 </div>
             </div>
         </div>
-        <ProductReviews :productId="product.id" />
+        {{ console.log(product.id) }}
+        <ProductReviews v-if="product.id > 0" :productId="product.id" />
     </div>
 </template>
 
