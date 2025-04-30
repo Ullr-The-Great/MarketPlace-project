@@ -1,14 +1,27 @@
 <template>
   <nav class="navbar">
     <div class="navbar-container">
-      <div class="navbar-links">
-        <router-link to="/products" class="nav-link navbar-brand">
-          <img src="@/assets/logo.png" class="logo" alt="home">
+      <!-- Logo -->
+      <router-link to="/products" class="nav-link navbar-brand">
+        <img src="@/assets/logo.png" class="logo" alt="home">
+      </router-link>
 
-        </router-link>
-
+      <!-- Barra de búsqueda -->
+      <div class="search-bar">
+        <select v-model="selectedCategory" class="category-filter" @change="handleSearch">
+          <option value="">All Categories</option>
+          <option v-for="category in productStore.categories" :key="category.id" :value="category.id">
+            {{ category.name }}
+          </option>
+        </select>
+        <input 
+        type="text" v-model="searchQuery" 
+        placeholder="Search for products..." 
+        class="search-input"  
+        @input="handleSearch"/>
       </div>
 
+      <!-- Acciones de usuario -->
       <div class="navbar-actions">
         <template v-if="authStore.isAuthenticated">
           <div class="user-section">
@@ -22,25 +35,34 @@
       </div>
     </div>
   </nav>
-
 </template>
 
-<script setup>
+<script lang="ts" setup>
+import { ref, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/authStore';
-import { useCartStore } from '@/stores/cartStore';
-import LogoutButton from '@/components/LogoutButton.vue';
-import { useRouter } from 'vue-router';
+import { useProductStore } from '@/stores/productStore';
 import CartIndicator from './CartIndicator.vue';
+import LogoutButton from './LogoutButton.vue';
 
 const authStore = useAuthStore();
-const cartStore = useCartStore();
-const router = useRouter();
+const productStore = useProductStore();
 
-const handleCartClick = () => {
+const searchQuery = ref<string>(''); 
+const selectedCategory = ref<string>('');
 
-  router.push('/cart');
-
+// Manejar la búsqueda
+const handleSearch = () => {
+  productStore.updateFilters({
+    searchQuery: searchQuery.value,
+    categoryId: selectedCategory.value ? Number(selectedCategory.value) : null,
+  });
+  productStore.searchProducts(searchQuery.value, Number(selectedCategory.value) || null);
 };
+
+
+onMounted(() => {
+  productStore.fetchCategories();
+});
 </script>
 
 <style scoped>
@@ -54,7 +76,7 @@ const handleCartClick = () => {
   z-index: 1000;
   height: 100px;
   display: flex;
-  width:100%;
+  width: 100%;
 }
 
 .navbar-container {
@@ -87,7 +109,7 @@ const handleCartClick = () => {
   text-align: center;
 }
 
-.nav-link:hover{
+.nav-link:hover {
   background-color: var(--navbar-bg-hover);
 }
 
@@ -114,8 +136,42 @@ const handleCartClick = () => {
   color: var(--nav-text-secondary);
 }
 
-.logo{
+.logo {
   width: 200px;
   height: 80px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  width: 50vw;
+  gap: 0.5rem;
+}
+
+.category-filter {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--secondary-background-color);
+}
+
+.search-input {
+  flex-grow: 1;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.search-button {
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.search-button:hover {
+  background-color: var(--primary-color-hover);
 }
 </style>

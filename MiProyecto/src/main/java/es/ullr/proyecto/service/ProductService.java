@@ -75,4 +75,23 @@ public class ProductService
         Pageable pageable = PageRequest.of(page, size);
         return productRepository.findAll(pageable);
     }
+
+	public Page<Product> findProductsByCategoryIdPaginated(Long categoryId, int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    return productRepository.findByCategoryId(categoryId, pageable);
+}
+
+	public List<Product> findProductsByNameAndCategory(String name, Long categoryId) {
+	    return productRepository.findByNameContainingIgnoreCaseAndCategoryId(name, categoryId);
+	}
+
+	public Page<Product> findProductsByNamePaginated(String name, int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    return productRepository.findByNameContainingIgnoreCase(name, pageable);
+}
+
+public Page<Product> findProductsByNameAndCategoryPaginated(String name, Long categoryId, int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    return productRepository.findByNameContainingIgnoreCaseAndCategoryId(name, categoryId, pageable);
+}
 }

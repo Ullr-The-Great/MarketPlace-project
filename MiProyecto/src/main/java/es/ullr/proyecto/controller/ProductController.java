@@ -55,14 +55,17 @@ public class ProductController
 
     // Obtener productos por categoría
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<List<Product>> getProductsByCategory(@PathVariable Long categoryId) 
-    {
-        List<Product> products = productService.findProductsByCategoryId(categoryId);
-        return new ResponseEntity<>(products, HttpStatus.OK);
+    public ResponseEntity<Page<ProductDto>> getProductsByCategoryPaginated(
+        @PathVariable Long categoryId,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "3") int size
+    ) {
+        Page<Product> productPage = productService.findProductsByCategoryIdPaginated(categoryId, page, size);
+        Page<ProductDto> productDtoPage = productPage.map(ProductDto::new); // Convertir a DTO
+        return ResponseEntity.ok(productDtoPage);
     }
-
     // Buscar productos por nombre
-    @GetMapping("/search")
+    @GetMapping("/search-by-name")
     public ResponseEntity<List<Product>> searchProductsByName(@RequestParam String name) 
     {
         List<Product> products = productService.findProductsByNameContaining(name);
@@ -120,6 +123,26 @@ public class ProductController
 	        Page<Product> productPage = productService.findPaginatedProducts(page, size);
 	        Page<ProductDto> productDtoPage = productPage.map(ProductDto::new); // Convertir a DTO
 	        return ResponseEntity.ok(productDtoPage);
+	    }
+	    
+	    //Paginado
+	    @GetMapping("/search")
+	    public ResponseEntity<Page<ProductDto>> searchProducts(
+	        @RequestParam String name,
+	        @RequestParam(required = false) Long categoryId,
+	        @RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "3") int size
+	    ) {
+	        Page<Product> products;
+
+	        if (categoryId != null) {
+	            products = productService.findProductsByNameAndCategoryPaginated(name, categoryId, page, size);
+	        } else {
+	            products = productService.findProductsByNamePaginated(name, page, size);
+	        }
+
+	        Page<ProductDto> productDtos = products.map(ProductDto::new);
+	        return ResponseEntity.ok(productDtos);
 	    }
     
 }
