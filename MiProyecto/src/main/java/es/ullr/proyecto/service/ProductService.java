@@ -86,12 +86,16 @@ public class ProductService
 	}
 
 	public Page<Product> findProductsByNamePaginated(String name, int page, int size) {
-    Pageable pageable = PageRequest.of(page, size);
-    return productRepository.findByNameContainingIgnoreCase(name, pageable);
-}
+	    Pageable pageable = PageRequest.of(page, size);
+	    return productRepository.findByNameContainingIgnoreCase(name, pageable);
+	}
 
-public Page<Product> findProductsByNameAndCategoryPaginated(String name, Long categoryId, int page, int size) {
-    Pageable pageable = PageRequest.of(page, size);
-    return productRepository.findByNameContainingIgnoreCaseAndCategoryId(name, categoryId, pageable);
-}
+	public Page<Product> findProductsByNameAndCategoryPaginated(String name, Long categoryId, int page, int size) {
+	    Pageable pageable = PageRequest.of(page, size);
+	    return productRepository.findByNameContainingIgnoreCaseAndCategoryId(name, categoryId, pageable);
+	}
+	
+	public Product saveProduct(Product product) {
+	    return productRepository.save(product);
+	}
 }

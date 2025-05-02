@@ -74,6 +74,23 @@ public class PaymentController {
             order.setCreatedAt(LocalDateTime.now());
             order.setPaymentIntentId(paymentIntent.getId());
 
+            
+         // Reducir el stock de los productos
+            for (Map<String, Object> item : items) {
+                Long productId = ((Number) item.get("productId")).longValue();
+                Integer quantity = ((Number) item.get("quantity")).intValue();
+
+                Product product = productService.findProductById(productId)
+                        .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+                if (product.getStock() < quantity) {
+                    throw new RuntimeException("Stock insuficiente para el producto: " + product.getName());
+                }
+
+                product.setStock(product.getStock() - quantity);
+                productService.saveProduct(product);
+            }
+            
             // Crear los OrderItems asociados
             List<OrderItem> orderItems = new ArrayList<>();
             for (Map<String, Object> item : items) {
