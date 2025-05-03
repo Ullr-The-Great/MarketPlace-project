@@ -21,13 +21,14 @@ public class UserService
     private PasswordEncoder passwordEncoder;
 
     public User createUser(User user) {
-    	 if (user.getUsername() == null || user.getUsername().isEmpty()) {
+    	 if (user.getUsername() == null || user.getUsername().isEmpty() || user.getUsername().isBlank()) {
     	        throw new IllegalArgumentException("Username is required");
     	    }
     	    
-    	    if (user.getPassword() == null || user.getPassword().isEmpty()) {
+    	    if (user.getPassword() == null || user.getPassword().isEmpty() || user.getPassword().isBlank()) {
     	        throw new IllegalArgumentException("Password is required");
     	    }
+    	   
     	    
     	    user.setPassword(passwordEncoder.encode(user.getPassword()));
     	    return userRepository.save(user);
@@ -57,7 +58,10 @@ public class UserService
             throw new RuntimeException("No hay un usuario autenticado");
         }
 
+   
+
         String username = authentication.getName();
+        System.out.println("Buscando usuario con username: " + username);
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
