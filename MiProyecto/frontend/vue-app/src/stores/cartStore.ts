@@ -42,9 +42,9 @@ export const useCartStore = defineStore('cart', {
       try {
         const response = await api.get<CartResponse>(`/carts/${cartId}/items`);
         this.currentCart = response.data;
-        // No necesitas calcular totalItems, ya viene del backend
+
       } catch (error) {
-        // Manejo de errores
+
       } finally {
         this.loading = false;
       }
@@ -86,7 +86,7 @@ export const useCartStore = defineStore('cart', {
           this.loading = false;
       }
   },
-  async removeFromCart(itemId: number) {  // Cambia el parámetro de productId a itemId
+  async removeFromCart(itemId: number) { 
     if (!this.currentCart) {
       throw new Error('No cart initialized');
     }
@@ -94,13 +94,13 @@ export const useCartStore = defineStore('cart', {
     this.loading = true;
     try {
       await api.delete(
-        `/carts/items/${itemId}`  // Ajusta la ruta para coincidir con el backend
+        `/carts/items/${itemId}`
       );
       
       // Actualizar el carrito local
       if (this.currentCart.items) {
         this.currentCart.items = this.currentCart.items.filter(
-          item => item.id !== itemId  // Filtra por item.id en lugar de product.id
+          item => item.id !== itemId
         );
       }
     } catch (error) {
@@ -111,10 +111,9 @@ export const useCartStore = defineStore('cart', {
     }
   },
   async updateQuantity (itemId: number, newQuantity: number) {
-    this.loading = true; // Activa el estado de carga
+    this.loading = true; // Activar el estado de carga
     try {
       const response = await api.put(`/carts/items/${itemId}`, { quantity: newQuantity });
-      // Actualización optimista del estado local
       if (this.currentCart?.items) {
         const item = this.currentCart.items.find(i => i.id === itemId);
         if (item) item.quantity = newQuantity;
@@ -125,7 +124,7 @@ export const useCartStore = defineStore('cart', {
       this.error = error instanceof Error ? error.message : 'Failed to update quantity';
       throw error;
     } finally {
-      this.loading = false; // Desactiva el estado de carga
+      this.loading = false; // Desactivar el estado de carga
     }
   },
   async clearCart() {
@@ -134,8 +133,8 @@ export const useCartStore = defineStore('cart', {
     this.loading = true;
     try {
       console.log("Intentando vaciar el carrito...");
-      await api.delete(`/carts`); // Llama al endpoint correcto en el backend
-      this.currentCart.items = []; // Limpia los ítems localmente
+      await api.delete(`/carts`);
+      this.currentCart.items = []; // Limpiar los ítems localmente
     } catch (error) {
       this.error = error instanceof Error ? error.message : 'Unknown error';
       throw error;
@@ -145,14 +144,14 @@ export const useCartStore = defineStore('cart', {
   },
     async initializeCart(userId: number) {
       try {
-        // Primero intentamos obtener el carrito existente
+        
         const userCart = await this.findUserCart(userId);      
 
         if (userCart) {
-          // 2. Si existe, cargar sus items
+          
           await this.fetchCart();
         } else {
-          // 3. Si no existe, crear uno nuevo
+
           const response = await api.post('/carts', { userId });
           this.currentCart = response.data;
         }
@@ -168,7 +167,7 @@ export const useCartStore = defineStore('cart', {
         return response.data;
       } catch (error:any) {
         if (error.response?.status === 404) {
-          return null; // No existe carrito
+          return null;
         }
         throw error;
       }

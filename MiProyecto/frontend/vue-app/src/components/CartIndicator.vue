@@ -2,7 +2,7 @@
   <div class="cart-indicator">
     <button @click="goToCart" class="cart-button">
       <div class="cart-image">
-        <img src="@/assets/black-cart.png"> <span class="badge" v-if="cartItemsCount >= 0">{{ cartItemsCount }}</span>
+        <img src="@/assets/black-cart.png" alt="carrito"> <span class="badge" v-if="cartItemsCount >= 0">{{ cartItemsCount }}</span>
       </div>
     </button>
   </div>
