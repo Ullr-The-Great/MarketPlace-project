@@ -50,7 +50,7 @@ export const useProductStore = defineStore('product', {
         this.loading = false
       }
     },
-    async fetchProductsByCategory(categoryId: number | null, page = 0, size = 3) {
+    async fetchProductsByCategory(categoryId: number | null, page = 0, size = 5) {
       this.loading = true;
       try {
         if (categoryId === null) {
@@ -94,7 +94,7 @@ export const useProductStore = defineStore('product', {
         console.error('Error fetching categories:', error)
       }
     },
-    async searchProducts(query: string, categoryId: number | null = null, page = 0, size = 3) {
+    async searchProducts(query: string, categoryId: number | null = null, page = 0, size = 5) {
       this.loading = true;
       try {
         const response = await api.get('/products/search', {
@@ -119,7 +119,7 @@ export const useProductStore = defineStore('product', {
     updateFilters(newFilters: Partial<typeof this.filters>) {
       this.filters = { ...this.filters, ...newFilters }
     },
-    async fetchPaginatedProducts(page = 0, size = 3) {
+    async fetchPaginatedProducts(page = 0, size = 5) {
       this.loading = true;
       try {
         const response = await api.get(`/products/paginated`, {

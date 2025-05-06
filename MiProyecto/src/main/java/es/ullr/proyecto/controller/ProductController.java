@@ -118,7 +118,7 @@ public class ProductController
 	    @GetMapping("/paginated")
 	    public ResponseEntity<Page<ProductDto>> getPaginatedProducts(
 	        @RequestParam(defaultValue = "0") int page,
-	        @RequestParam(defaultValue = "3") int size
+	        @RequestParam(defaultValue = "5") int size
 	    ) {
 	        Page<Product> productPage = productService.findPaginatedProducts(page, size);
 	        Page<ProductDto> productDtoPage = productPage.map(ProductDto::new); // Convertir a DTO
@@ -131,7 +131,7 @@ public class ProductController
 	        @RequestParam String name,
 	        @RequestParam(required = false) Long categoryId,
 	        @RequestParam(defaultValue = "0") int page,
-	        @RequestParam(defaultValue = "3") int size
+	        @RequestParam(defaultValue = "5") int size
 	    ) {
 	        Page<Product> products;
 

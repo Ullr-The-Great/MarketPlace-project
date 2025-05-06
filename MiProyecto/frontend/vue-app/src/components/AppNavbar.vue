@@ -29,7 +29,7 @@
           </div>
         </template>
         <template v-else>
-          <router-link to="/login" class="nav-link">Sign In</router-link>
+          <router-link to="/login" class="nav-link nav-login">Sign In</router-link>
         </template>
         <CartIndicator />
       </div>
@@ -109,7 +109,7 @@ onMounted(() => {
   text-align: center;
 }
 
-.nav-link:hover {
+.nav-login:hover {
   background-color: var(--navbar-bg-hover);
 }
 
