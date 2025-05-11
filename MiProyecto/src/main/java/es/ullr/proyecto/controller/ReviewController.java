@@ -38,7 +38,7 @@ public class ReviewController
     public ResponseEntity<Review> createOrUpdateReview(
         @RequestParam Long productId,
         @RequestParam int rating,
-        @RequestParam String commentario,
+        @RequestParam String comment,
         Authentication authentication
     ) {
         User user = userService.findByUsername(authentication.getName())
@@ -59,11 +59,11 @@ public class ReviewController
         if (existingReview.isPresent()) {
             Review review = existingReview.get();
             review.setRating(rating);
-            review.setCommentario(commentario);
+            review.setComment(comment);
             return new ResponseEntity<>(reviewService.saveReview(review), HttpStatus.OK);
         }
 
-        Review newReview = reviewService.createReview(product, user, rating, commentario);
+        Review newReview = reviewService.createReview(product, user, rating, comment);
         return new ResponseEntity<>(newReview, HttpStatus.CREATED);
     }
     
