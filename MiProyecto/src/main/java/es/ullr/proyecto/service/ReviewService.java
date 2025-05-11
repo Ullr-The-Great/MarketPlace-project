@@ -23,7 +23,7 @@ public class ReviewService
         review.setProduct(product);
         review.setUser(user);
         review.setRating(rating);
-        review.setCommentario(commentario);
+        review.setComment(commentario);
         review.setCreatedAt(LocalDateTime.now());
         return reviewRepository.save(review);
     }
