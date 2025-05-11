@@ -3,6 +3,8 @@ package es.ullr.proyecto.service;
 import es.ullr.proyecto.model.User;
 import es.ullr.proyecto.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +21,17 @@ public class UserService
     private PasswordEncoder passwordEncoder;
 
     public User createUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword())); // Codificar la contraseña
-        return userRepository.save(user);
+    	 if (user.getUsername() == null || user.getUsername().isEmpty() || user.getUsername().isBlank()) {
+    	        throw new IllegalArgumentException("Username is required");
+    	    }
+    	    
+    	    if (user.getPassword() == null || user.getPassword().isEmpty() || user.getPassword().isBlank()) {
+    	        throw new IllegalArgumentException("Password is required");
+    	    }
+    	   
+    	    
+    	    user.setPassword(passwordEncoder.encode(user.getPassword()));
+    	    return userRepository.save(user);
     }
 
     public Optional<User> findByUsername(String username) {
@@ -40,5 +51,20 @@ public class UserService
     	
     	userRepository.deleteById(id);
     }
+    
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("No hay un usuario autenticado");
+        }
+
+   
+
+        String username = authentication.getName();
+        System.out.println("Buscando usuario con username: " + username);
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    }
+    
     
 }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReviewService
@@ -22,7 +23,7 @@ public class ReviewService
         review.setProduct(product);
         review.setUser(user);
         review.setRating(rating);
-        review.setCommentario(commentario);
+        review.setComment(commentario);
         review.setCreatedAt(LocalDateTime.now());
         return reviewRepository.save(review);
     }
@@ -36,4 +37,21 @@ public class ReviewService
     {
         return reviewRepository.findByProductId(productId);
     }
+
+    public Optional<Review> findReviewByProductAndUser(Product product, User user) {
+        return reviewRepository.findByProductAndUser(product, user);
+    }
+
+    public Review saveReview(Review review) {
+        return reviewRepository.save(review);
+    }
+    
+    public void deleteReview(Long reviewId) {
+        reviewRepository.deleteById(reviewId);
+    }
+
+	public Optional<Review> findById(Long reviewId) {
+		// TODO Auto-generated method stub
+		return reviewRepository.findById(reviewId);
+	}
 }

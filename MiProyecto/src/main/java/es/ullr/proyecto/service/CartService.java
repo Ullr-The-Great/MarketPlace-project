@@ -7,6 +7,8 @@ import es.ullr.proyecto.model.User;
 import es.ullr.proyecto.repository.CartItemRepository;
 import es.ullr.proyecto.repository.CartRepository;
 import es.ullr.proyecto.repository.ProductRepository;
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -51,6 +53,16 @@ public class CartService {
                 return cartRepository.save(newCart);
             });
     }
+    
+    public Cart findOrCreateCartById(Long id) {
+        return cartRepository.findById(id)
+            .orElseGet(() -> {
+                Cart newCart = new Cart();
+                newCart.setId(id);
+                return cartRepository.save(newCart);
+            });
+    }
+
 
     public CartItem addProductToCart(Cart cart, Product product, int quantity) {
         Optional<CartItem> existingCartItem = cartItemRepository.findByCartAndProduct(cart, product);
@@ -88,19 +100,20 @@ public class CartService {
         return cartItemRepository.findByCart(cart);
     }
     
-    public void clearCart(User user) {
+    @Transactional
+    public void clearCartItems(Cart cart) {
+        cartItemRepository.deleteByCart(cart); // Elimina todos los ítems asociados al carrito
+    }
+    
+    public CartItem updateCartItemQuantity(Long cartItemId, int newQuantity) {
+        CartItem cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new RuntimeException("Cart item not found"));
         
-    	Cart cart = getOrCreateCart(user);
-    	cartItemRepository.deleteByCart(cart);;
-    	/*Optional<Cart> cartOptional = cartRepository.findByUser(user);
+        if (newQuantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than zero");
+        }
         
-        if(cartOptional.isPresent()) {
-        	Cart cart = cartOptional.get();
-        	
-        	List<CartItem> cartItems = cart.getCartItems();
-        	
-        	cartItemRepository.deleteAll(cartItems);
-        	
-        }*/
+        cartItem.setQuantity(newQuantity);
+        return cartItemRepository.save(cartItem);
     }
 }
