@@ -46,35 +46,6 @@
 - [JPA/Hibernate](https://hibernate.org/) (Persistencia de datos)
 - [H2 Database](https://www.h2database.com/) (Base de datos en memoria para pruebas)
 
-
-# **Guía de Instalación y Despliegue**
-
-Esta guía te ayudará a instalar y desplegar la aplicación **MiProyecto**, que incluye un backend desarrollado en **Spring Boot** y un frontend en **Vue.js**.
-
----
-
-## **Requisitos Previos**
-
-Antes de comenzar, asegúrate de tener instalados los siguientes programas y herramientas:
-
-1. **Node.js** (v16 o superior)  
-   [Descargar Node.js](https://nodejs.org/)
-2. **Java** (v17 o superior)  
-   [Descargar Java](https://www.oracle.com/java/technologies/javase-downloads.html)
-3. **Maven** (v3.6 o superior)  
-   [Descargar Maven](https://maven.apache.org/download.cgi)
-4. **Base de Datos Oracle** (o cualquier base de datos compatible configurada en `application.properties`).
-5. **Git** (opcional, para clonar el repositorio)  
-   [Descargar Git](https://git-scm.com/)
-
----
-
-## **1. Clonar el Repositorio**
-
-Clona el repositorio en tu máquina local:
-
-```bash
-git clone https://github.com/tu-usuario/MiProyecto.git
 ---
 
 ## 📂 **Estructura del Proyecto**
@@ -95,6 +66,3 @@ MiProyecto/
 │   └── test/                  # Pruebas del backend
 ├── [pom.xml](http://_vscodecontentref_/2)                    # Configuración de Maven
 └── [README.md](http://_vscodecontentref_/3)                  # Este archivo
-
-
-cd MiProyecto
