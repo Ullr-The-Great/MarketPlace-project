@@ -50,29 +50,24 @@ export const useAuthStore = defineStore('auth', {
           await api.post('/auth/logout');
         }
   
-        // Limpiar carrito
         const cartStore = useCartStore();
         cartStore.$reset();
         cartStore.clearCart();
 
-        // Redirigir a login
         router.push('/login');
       } catch (error) {
         console.error("Error during logout:", error);
       }
       finally{
-        // Limpiar estado
+
         this.token = null;
         this.user = null;
         localStorage.removeItem('auth_token');
         
-        // Resetear carrito
+
         const cartStore = useCartStore();
         cartStore.$reset();
-        
-        // Redirigir a login
-       
-        const router = useRouter();
+      
         this.clearAuth();
        
       }
@@ -98,11 +93,10 @@ export const useAuthStore = defineStore('auth', {
     this.user = null;
     localStorage.removeItem('auth_token');
     
-    // Limpiar carrito
+    
     const cartStore = useCartStore();
     cartStore.$reset();
     
-    // No redirigir aquí, dejar que el componente lo maneje
   }
   },
   getters: {

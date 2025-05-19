@@ -121,7 +121,7 @@ const handlePayment = async () => {
 
 const redirectToProducts = () => {
   showModal.value = false;
-  router.push('/products'); // Redirigir a la página principal
+  router.push('/products');
 };
 </script>
 
@@ -209,6 +209,6 @@ button:disabled {
 }
 
 .modal button:hover {
-  background-color: #5469d4;
+  background-color: #ffec82;
 }
 </style>
