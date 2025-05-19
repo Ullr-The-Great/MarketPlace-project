@@ -24,7 +24,9 @@ public class Review {
     private Integer rating;
 
     @Column(columnDefinition = "CLOB")
-    private String comment;
+
+    private String comment_review;
+
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

@@ -55,7 +55,10 @@ public class SecurityConfig {
 										,"/api/auth/me"
 										,"/api/products/category/**"
 										,"/api/products/search"
-										,"/api/categories")
+										,"/api/categories"
+										,"/api/reviews/product/**"
+										,"/api/orders/**")
+
 										.permitAll()
 						.anyRequest().authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

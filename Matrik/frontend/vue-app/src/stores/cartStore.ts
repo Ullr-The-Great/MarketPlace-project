@@ -120,6 +120,7 @@ export const useCartStore = defineStore('cart', {
       }
       return response.data;
     } catch (error) {
+
       this.error = error instanceof Error ? error.message : 'Failed to update quantity';
       throw error;
     } finally {

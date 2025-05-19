@@ -13,7 +13,9 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@stripe/stripe-js": "^7.3.0",
+
+    "@stripe/stripe-js": "^7.2.0",
+
     "axios": "^1.8.4",
     "pinia": "^3.0.2",
     "pinia-plugin-persistedstate": "^4.2.0",

@@ -59,10 +59,12 @@ export const useAuthStore = defineStore('auth', {
         console.error("Error during logout:", error);
       }
       finally{
+
         this.token = null;
         this.user = null;
         localStorage.removeItem('auth_token');
         
+
         const cartStore = useCartStore();
         cartStore.$reset();
       
@@ -91,11 +93,10 @@ export const useAuthStore = defineStore('auth', {
     this.user = null;
     localStorage.removeItem('auth_token');
     
-    // Limpiar carrito
+    
     const cartStore = useCartStore();
     cartStore.$reset();
     
-    // No redirigir aquí, dejar que el componente lo maneje
   }
   },
   getters: {

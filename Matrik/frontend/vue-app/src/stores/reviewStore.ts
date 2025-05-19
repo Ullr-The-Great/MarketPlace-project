@@ -27,14 +27,18 @@ export const useReviewStore = defineStore('review', () => {
     }
   };
 
-  const submitReview = async (productId: number, newReview: { rating: number; commentario: string }, editingReviewId: number | null) => {
+
+  const submitReview = async (productId: number, newReview: { rating: number; comment_review: string }, editingReviewId: number | null) => {
+
     loading.value = true;
     try {
       const response = await api.post(`/reviews`, null, {
         params: {
           productId,
           rating: newReview.rating,
-          commentario: newReview.commentario,
+
+          comment_review: newReview.comment_review,
+
         },
       });
 

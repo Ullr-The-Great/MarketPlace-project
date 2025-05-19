@@ -140,8 +140,10 @@ const addToCart = () => {
 </script>   
 
 <style scoped>
+
 @import "../../styles/product-view.css"
 /*
+
 .product-view {
     max-width: 1400px;
     margin: 2rem auto;
@@ -352,5 +354,6 @@ const addToCart = () => {
     .thumbnail-grid {
         grid-template-columns: repeat(3, 1fr);
     }
+
 }*/
 </style>
