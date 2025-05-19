@@ -29,7 +29,7 @@
         </select>
 
         <label for="comment">Comment:</label>
-        <textarea v-model="newReview.commentario" id="comment" required></textarea>
+        <textarea v-model="newReview.comment_review" id="comment" required></textarea>
 
         <button type="submit" :disabled="reviewStore.loading">
           {{ editingReviewId ? 'Update Review' : 'Submit Review' }}
@@ -51,7 +51,7 @@
               <span v-for="n in 5" :key="n" class="star" :class="{ filled: n <= review.rating }">★</span>
             </span>
           </div>
-          <p class="review-comment">{{ review.commentario }}</p>
+          <p class="review-comment">{{ review.comment_review }}</p>
           <div v-if="authStore.user?.username === review.user.username" class="review-options">
             <button @click="startEditingReview(review)">Edit</button>
             <button @click="reviewStore.deleteReview(review.id)">Delete</button>
@@ -80,7 +80,7 @@ const hasPurchased = ref(false);
 
 const newReview = ref({
   rating: 5,
-  commentario: '',
+  comment_review: '',
 });
 const showForm = ref(false);
 const editingReviewId = ref<number | null>(null);
@@ -91,6 +91,8 @@ const fetchReviews = async () => {
 
 const checkIfUserPurchased = async () => {
   try {
+    if(!authStore.user) return;
+
     const response = await api.get(`/orders/has-purchased/${props.productId}`);
     hasPurchased.value = response.data.hasPurchased;
     console.log('Has purchased:', hasPurchased.value);
@@ -113,7 +115,7 @@ const submitReview = async () => {
 
 const startEditingReview = (review: Review) => {
   newReview.value.rating = review.rating;
-  newReview.value.commentario = review.commentario;
+  newReview.value.comment_review = review.comment_review;
   editingReviewId.value = review.id;
   showForm.value = true;
 };
@@ -124,7 +126,7 @@ const cancelForm = () => {
 
 const resetForm = () => {
   newReview.value.rating = 5;
-  newReview.value.commentario = '';
+  newReview.value.comment_review = '';
   editingReviewId.value = null;
   showForm.value = false;
 };
