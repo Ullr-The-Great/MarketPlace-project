@@ -140,6 +140,8 @@ const addToCart = () => {
 </script>   
 
 <style scoped>
+@import "../../styles/product-view.css"
+/*
 .product-view {
     max-width: 1400px;
     margin: 2rem auto;
@@ -259,7 +261,7 @@ const addToCart = () => {
 }
 
 .add-to-cart-button:hover:not(:disabled) {
-    background-color: #0056b3;
+    background-color: var( --primary-color-hover);
 }
 
 .add-to-cart-button:disabled {
@@ -350,5 +352,5 @@ const addToCart = () => {
     .thumbnail-grid {
         grid-template-columns: repeat(3, 1fr);
     }
-}
+}*/
 </style>

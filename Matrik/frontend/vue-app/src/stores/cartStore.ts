@@ -120,11 +120,10 @@ export const useCartStore = defineStore('cart', {
       }
       return response.data;
     } catch (error) {
-      // Revertir cambios si falla
       this.error = error instanceof Error ? error.message : 'Failed to update quantity';
       throw error;
     } finally {
-      this.loading = false; // Desactivar el estado de carga
+      this.loading = false;
     }
   },
   async clearCart() {
