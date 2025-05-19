@@ -156,8 +156,10 @@ const increaseQuantity = async (item: CartItem) => {
   globalLoading.value = true;
   try {
     const newQuantity = item.quantity + 1;
-    await cartStore.updateQuantity(item.id, newQuantity);
-    item.quantity = newQuantity;
+    
+     await cartStore.updateQuantity(item.id, newQuantity);
+
+     item.quantity = newQuantity;
   } catch (error) {
     console.error('Error increasing quantity:', error);
   } finally {

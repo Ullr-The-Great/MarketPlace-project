@@ -36,7 +36,6 @@ export const useCartStore = defineStore('cart', {
   },
   actions: {
     async fetchCart() {
-      this.loading = true;
       const userCartResponse = await api.get('/carts');
       const cartId = userCartResponse.data.id;
       try {
@@ -46,7 +45,6 @@ export const useCartStore = defineStore('cart', {
       } catch (error) {
 
       } finally {
-        this.loading = false;
       }
     },
     async addToCart(product: Product, quantity: number = 1) {
@@ -59,7 +57,6 @@ export const useCartStore = defineStore('cart', {
           throw new Error('No cart initialized');
       }
       
-      this.loading = true;
       try {
           const response = await api.post(
               `/carts/${this.currentCart.id}/items`,
@@ -83,7 +80,6 @@ export const useCartStore = defineStore('cart', {
           console.error('Error adding to cart:', error);
           throw error;
       } finally {
-          this.loading = false;
       }
   },
   async removeFromCart(itemId: number) { 
@@ -91,7 +87,6 @@ export const useCartStore = defineStore('cart', {
       throw new Error('No cart initialized');
     }
     
-    this.loading = true;
     try {
       await api.delete(
         `/carts/items/${itemId}`
@@ -107,11 +102,9 @@ export const useCartStore = defineStore('cart', {
       this.error = error instanceof Error ? error.message : 'Unknown error';
       throw error;
     } finally {
-      this.loading = false;
     }
   },
   async updateQuantity (itemId: number, newQuantity: number) {
-    this.loading = true; // Activar el estado de carga
     try {
       const response = await api.put(`/carts/items/${itemId}`, { quantity: newQuantity });
       if (this.currentCart?.items) {
@@ -124,7 +117,6 @@ export const useCartStore = defineStore('cart', {
       this.error = error instanceof Error ? error.message : 'Failed to update quantity';
       throw error;
     } finally {
-      this.loading = false;
     }
   },
   async clearCart() {
